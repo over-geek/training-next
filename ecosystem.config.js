@@ -2,7 +2,8 @@ module.exports = {
   apps: [
     {
       name: 'training-next',
-      script: '.next/standalone/server.js',
+      script: 'npx',
+      args: 'next start',
       instances: 1,
       exec_mode: 'fork',
       env: {

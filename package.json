@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
-    "start": "pm2-runtime start ecosystem.config.js --env production || node .next/standalone/server.js",
+    "start": "pm2-runtime start ecosystem.config.js --env production || npx next start --port $PORT",
     "lint": "eslint"
   },
   "dependencies": {
