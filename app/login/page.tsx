@@ -1,86 +1,38 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AuthService, type LoginCredentials, type ApiError } from '@/lib/auth-service';
-import { Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react';
+import { AuthService } from '@/lib/auth-service';
+import { OAUTH_BASE_URL, API_ENDPOINTS } from '@/lib/api-config';
+import { AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string>('');
-  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
-  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
-  const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
-  const [forgotPasswordError, setForgotPasswordError] = useState('');
-  const [showForgotPasswordDialog, setShowForgotPasswordDialog] = useState(false);
-
-  const [formData, setFormData] = useState<LoginCredentials>({
-    email: '',
-    password: '',
-  });
 
   useEffect(() => {
     if (AuthService.isAuthenticated()) {
       router.push('/dashboard');
     }
-  }, [router]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-    if (error) setError('');
-  };
+    // Check for OAuth error in URL parameters
+    const errorParam = searchParams.get('error');
+    const messageParam = searchParams.get('message');
+    
+    if (errorParam && messageParam) {
+      setError(decodeURIComponent(messageParam));
+    }
+  }, [router, searchParams]);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const handleAzureLogin = () => {
+    // Clear any existing errors
     setError('');
-
-    try {
-      await AuthService.login(formData);
-      router.push('/dashboard');
-    } catch (err) {
-      const apiError = err as ApiError;
-      setError(apiError.message || 'Login failed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setForgotPasswordLoading(true);
-    setForgotPasswordError('');
-    setForgotPasswordSuccess(false);
-
-    try {
-      await AuthService.forgotPassword(forgotPasswordEmail);
-      setForgotPasswordSuccess(true);
-      setForgotPasswordEmail('');
-    } catch (err) {
-      const apiError = err as ApiError;
-      setForgotPasswordError(apiError.message || 'Failed to send reset email. Please try again.');
-    } finally {
-      setForgotPasswordLoading(false);
-    }
-  };
-
-  const resetForgotPasswordDialog = () => {
-    setForgotPasswordEmail('');
-    setForgotPasswordError('');
-    setForgotPasswordSuccess(false);
-    setShowForgotPasswordDialog(false);
+    // Redirect to Spring Boot Azure AD OAuth2 endpoint
+    window.location.href = `${OAUTH_BASE_URL}${API_ENDPOINTS.AUTH.OAUTH_AZURE}`;
   };
 
   return (
@@ -132,150 +84,32 @@ export default function LoginPage() {
               </div>
               <CardTitle className="text-xl font-bold text-center">Sign in to your account</CardTitle>
               <CardDescription className="text-center text-sm">
-                Enter your credentials to access your training portal
+                Use your Microsoft account to access the training portal
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleLogin} className="space-y-4">
-                {error && (
-                  <div className="flex items-center space-x-2 p-3 rounded-lg bg-red-50 border border-red-200">
-                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                    <p className="text-sm text-red-700">{error}</p>
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email address</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      required
-                      placeholder="Enter your email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="pl-10"
-                      disabled={isLoading}
-                    />
+              {error && (
+                <div className="mb-4 flex items-start space-x-2 p-3 rounded-lg bg-red-50 border border-red-200">
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-red-800">Authentication Failed</p>
+                    <p className="text-xs text-red-700 mt-1">{error}</p>
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <Input
-                      id="password"
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      placeholder="Enter your password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      className="pl-10 pr-10"
-                      disabled={isLoading}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      disabled={isLoading}
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-end">
-                  <Dialog open={showForgotPasswordDialog} onOpenChange={setShowForgotPasswordDialog}>
-                    <DialogTrigger asChild>
-                      <button
-                        type="button"
-                        className="text-sm text-blue-600 hover:text-blue-500 font-medium"
-                        onClick={() => setShowForgotPasswordDialog(true)}
-                      >
-                        Forgot your password?
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Reset your password</DialogTitle>
-                        <DialogDescription>
-                          Enter your email address and we&apos;ll send you a link to reset your password.
-                        </DialogDescription>
-                      </DialogHeader>
-                      
-                      {forgotPasswordSuccess ? (
-                        <div className="space-y-4">
-                          <div className="flex items-center space-x-2 p-3 rounded-lg bg-green-50 border border-green-200">
-                            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                            <p className="text-sm text-green-700">
-                              Password reset email sent! Check your inbox for further instructions.
-                            </p>
-                          </div>
-                          <Button
-                            onClick={resetForgotPasswordDialog}
-                            className="w-full"
-                          >
-                            Close
-                          </Button>
-                        </div>
-                      ) : (
-                        <form onSubmit={handleForgotPassword} className="space-y-4">
-                          {forgotPasswordError && (
-                            <div className="flex items-center space-x-2 p-3 rounded-lg bg-red-50 border border-red-200">
-                              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                              <p className="text-sm text-red-700">{forgotPasswordError}</p>
-                            </div>
-                          )}
-                          
-                          <div className="space-y-2">
-                            <Label htmlFor="forgot-email">Email address</Label>
-                            <Input
-                              id="forgot-email"
-                              type="email"
-                              required
-                              placeholder="Enter your email"
-                              value={forgotPasswordEmail}
-                              onChange={(e) => setForgotPasswordEmail(e.target.value)}
-                              disabled={forgotPasswordLoading}
-                            />
-                          </div>
-                          
-                          <div className="flex space-x-2">
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={resetForgotPasswordDialog}
-                              className="flex-1"
-                              disabled={forgotPasswordLoading}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              type="submit"
-                              className="flex-1"
-                              disabled={forgotPasswordLoading}
-                            >
-                              {forgotPasswordLoading ? 'Sending...' : 'Send Reset Link'}
-                            </Button>
-                          </div>
-                        </form>
-                      )}
-                    </DialogContent>
-                  </Dialog>
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Signing in...' : 'Sign in'}
-                </Button>
-              </form>
+              )}
+              <Button
+                onClick={handleAzureLogin}
+                className="w-full bg-[#0078D4] hover:bg-[#106EBE] text-white"
+                size="lg"
+              >
+                <svg className="w-5 h-5 mr-2" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0 0h10.927v10.927H0V0z" fill="#f25022"/>
+                  <path d="M12.073 0H23v10.927H12.073V0z" fill="#7fba00"/>
+                  <path d="M0 12.073h10.927V23H0V12.073z" fill="#00a4ef"/>
+                  <path d="M12.073 12.073H23V23H12.073V12.073z" fill="#ffb900"/>
+                </svg>
+                Sign in with Microsoft
+              </Button>
             </CardContent>
           </Card>
         </div>

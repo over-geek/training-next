@@ -4,6 +4,7 @@
  */
 
 export const API_BASE_URL = 'http://localhost:8080/api';
+export const OAUTH_BASE_URL = 'http://localhost:8080';
 
 export const API_ENDPOINTS = {
   AUTH: {
@@ -11,6 +12,7 @@ export const API_ENDPOINTS = {
     LOGOUT: '/auth/signout',
     FORGOT_PASSWORD: '/auth/forgot-password',
     REFRESH_TOKEN: '/auth/refresh',
+    OAUTH_AZURE: '/oauth2/authorization/azure',
   },
   USER: {
     PROFILE: '/user/profile',

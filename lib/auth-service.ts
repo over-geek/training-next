@@ -7,6 +7,12 @@ export interface LoginCredentials {
   password: string;
 }
 
+interface LogoutResponse {
+  success: boolean;
+  message: string;
+  logoutUrl: string; // Add this field
+}
+
 export interface LoginResponse {
   token: string | null;
   userId: string | null;
@@ -160,34 +166,27 @@ export class AuthService {
           code: 'LOGIN_FAILED'
         } as ApiError;
       }
-      
-      // Store tokens (assuming refreshToken might be separate or part of response)
       TokenManager.setToken(responseData.token);
-      // For now, we'll use the token as refresh token until backend provides separate refresh token
       TokenManager.setRefreshToken(responseData.token);
       
       return responseData;
     } catch (error) {
-      // If it's already an ApiError we threw, pass it through
       if (error && typeof error === 'object' && 'message' in error && 'status' in error) {
         throw error as ApiError;
       }
-      // Otherwise, handle axios errors
       throw error as ApiError;
     }
   }
-
+  
   static async logout(): Promise<void> {
     try {
-      await api.post(API_ENDPOINTS.AUTH.LOGOUT);
-    } catch (error) {
-      // Even if logout fails on server, clear local tokens
-      console.error('Logout error:', error);
-    } finally {
+      const response = await api.post<LogoutResponse>(API_ENDPOINTS.AUTH.LOGOUT);
       TokenManager.clearTokens();
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login';
-      }
+      window.location.href = response.data?.logoutUrl || '/login';
+    } catch (error) {
+      console.error('Logout error:', error);
+      TokenManager.clearTokens();
+      window.location.href = '/login';
     }
   }
 
@@ -214,7 +213,11 @@ export class AuthService {
   static clearAuth(): void {
     TokenManager.clearTokens();
   }
+
+  static setOAuthToken(token: string): void {
+    TokenManager.setToken(token);
+    TokenManager.setRefreshToken(token);
+  }
 }
 
-// Export token manager for use in other parts of the app
 export { TokenManager };
