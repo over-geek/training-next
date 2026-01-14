@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'training-next',
-      script: 'npx',
+      script: './node_modules/next/dist/bin/next',
       args: 'next start',
       instances: 1,
       exec_mode: 'fork',
