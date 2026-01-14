@@ -279,7 +279,17 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
       return
     }
 
-    // Check audience-specific requirements
+    if (formData.audienceType === "ALL") {
+      if (formData.targetDepartmentIds.length === 0 && formData.selectedEmployeeIds.length === 0) {
+        toast.error("Please select at least one department or employee")
+        return
+      }
+      if (formData.targetDepartmentIds.length > 0 && formData.selectedEmployeeIds.length > 0) {
+        toast.error("Please select either departments or employees, not both")
+        return
+      }
+    }
+
     if (formData.audienceType === "DEPARTMENT" && formData.targetDepartmentIds.length === 0) {
       toast.error("Please select at least one department")
       return
@@ -291,7 +301,7 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
     }
 
     try {
-      // setIsSubmitting(true)
+      setIsSubmitting(true)
       const trainingData = {
         trainingId: formData.trainingId,
         facilitator: formData.facilitator,
@@ -304,8 +314,7 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
         targetDepartmentIds: formData.targetDepartmentIds,
       }
       await TrainingService.createTrainingSession(trainingData)
-      
-      onAddTraining() // Refresh the trainings list
+      onAddTraining()
       toast.success("Training session created successfully!")
       setOpen(false)
       resetForm()
@@ -322,7 +331,9 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
     formData.date && 
     formData.startTime && 
     formData.duration &&
-    (formData.audienceType === "ALL" || 
+    ((formData.audienceType === "ALL" && 
+      ((formData.targetDepartmentIds.length > 0 && formData.selectedEmployeeIds.length === 0) || 
+       (formData.selectedEmployeeIds.length > 0 && formData.targetDepartmentIds.length === 0))) || 
      (formData.audienceType === "DEPARTMENT" && formData.targetDepartmentIds.length > 0) ||
      (formData.audienceType === "SPECIFIC" && formData.selectedEmployeeIds.length > 0))
 
@@ -437,12 +448,15 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
             {selectedTraining ? (
               <div className="p-3 border rounded-md bg-muted/20">
                 <p className="text-sm font-medium">
-                  {selectedTraining.category === 'ALL' && 'All Employees'}
+                  {selectedTraining.category === 'ALL' && 'All Employees - Manual Selection'}
                   {selectedTraining.category === 'DEPARTMENT' && 'Specific Departments'}
                   {selectedTraining.category === 'SPECIFIC' && 'Specific Employees'}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Audience type is determined by the selected training
+                  {selectedTraining.category === 'ALL' 
+                    ? 'Select specific departments or employees for this session'
+                    : 'Audience type is determined by the selected training'
+                  }
                 </p>
               </div>
             ) : (
@@ -455,19 +469,32 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
           </div>
 
           {/* Department Selection - Conditional */}
-          {formData.audienceType === "DEPARTMENT" && (
+          {(formData.audienceType === "DEPARTMENT" || formData.audienceType === "ALL") && (
             <div className="space-y-2">
-              <Label>Select Departments *</Label>
-              <DepartmentSelector
-                selectedValues={formData.selectedDepartments}
-                onSelectionChange={(values) => setFormData(prev => ({ 
-                  ...prev, 
-                  selectedDepartments: values,
-                  targetDepartmentIds: values.map(v => parseInt(v))
-                }))}
-                departments={getFilteredDepartments()}
-                isLoading={isDepartmentsLoading}
-              />
+              <Label>Select Departments {formData.audienceType === "ALL" ? "(Optional)" : "*"}</Label>
+              {formData.audienceType === "ALL" && (
+                <p className="text-xs text-muted-foreground mb-2">
+                  {formData.selectedEmployeeIds.length > 0 
+                    ? "Department selection is disabled because specific employees are selected"
+                    : "Select departments or choose specific employees below (not both)"
+                  }
+                </p>
+              )}
+              <div className={cn(
+                formData.selectedEmployeeIds.length > 0 && "opacity-50 pointer-events-none"
+              )}>
+                <DepartmentSelector
+                  selectedValues={formData.selectedDepartments}
+                  onSelectionChange={(values) => setFormData(prev => ({
+                    ...prev,
+                    selectedDepartments: values,
+                    targetDepartmentIds: values.map(v => parseInt(v)),
+                    audienceType: values.length > 0 ? "DEPARTMENT" : prev.audienceType
+                  }))}
+                  departments={getFilteredDepartments()}
+                  isLoading={isDepartmentsLoading}
+                />
+              </div>
               {formData.targetDepartmentIds.length > 0 && (
                 <div className="text-sm text-muted-foreground">
                   {formData.targetDepartmentIds.length} department{formData.targetDepartmentIds.length !== 1 ? 's' : ''} selected
@@ -477,18 +504,31 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
           )}
 
           {/* Employee Selection - Conditional */}
-          {formData.audienceType === "SPECIFIC" && (
+          {(formData.audienceType === "SPECIFIC" || formData.audienceType === "ALL") && (
             <div className="space-y-2">
-              <Label>Select Employees *</Label>
-              <EmployeeSelector
-                selectedValues={formData.selectedEmployeeIds.map(id => id.toString())}
-                onSelectionChange={(values) => setFormData(prev => ({ 
-                  ...prev, 
-                  selectedEmployeeIds: values.map(v => parseInt(v))
-                }))}
-                employees={getFilteredEmployees()}
-                isLoading={isEmployeesLoading}
-              />
+              <Label>Select Employees {formData.audienceType === "ALL" ? "(Optional)" : "*"}</Label>
+              {formData.audienceType === "ALL" && (
+                <p className="text-xs text-muted-foreground mb-2">
+                  {formData.targetDepartmentIds.length > 0 
+                    ? "Employee selection is disabled because departments are selected"
+                    : "Select specific employees or choose departments above (not both)"
+                  }
+                </p>
+              )}
+              <div className={cn(
+                formData.targetDepartmentIds.length > 0 && "opacity-50 pointer-events-none"
+              )}>
+                <EmployeeSelector
+                  selectedValues={formData.selectedEmployeeIds.map(id => id.toString())}
+                  onSelectionChange={(values) => setFormData(prev => ({
+                    ...prev,
+                    selectedEmployeeIds: values.map(v => parseInt(v)),
+                    audienceType: values.length > 0 ? "SPECIFIC" : prev.audienceType
+                  }))}
+                  employees={getFilteredEmployees()}
+                  isLoading={isEmployeesLoading}
+                />
+              </div>
               {formData.selectedEmployeeIds.length > 0 && (
                 <div className="text-sm text-muted-foreground">
                   {formData.selectedEmployeeIds.length} employee{formData.selectedEmployeeIds.length !== 1 ? 's' : ''} selected
