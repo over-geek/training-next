@@ -1,0 +1,20 @@
+{
+  "pages": {
+    "/evaluation/[token]/page": [
+      "static/chunks/ff1a16fafef87110.js",
+      "static/chunks/7dd66bdf8a7e5707.js",
+      "static/chunks/d9009a6767584a08.css",
+      "static/chunks/44c67f0ed48278c1.js",
+      "static/chunks/88f8812530855146.js",
+      "static/chunks/92e46f07d693b7aa.js",
+      "static/chunks/fd001c8a751da4a6.js",
+      "static/chunks/e180ca62888d32d9.js",
+      "static/chunks/b22a4f32da38fd4a.js",
+      "static/chunks/e6b0468bc5e7fb2f.js",
+      "static/chunks/8082ab48faca5ea1.js",
+      "static/chunks/c19da6693934fea1.js",
+      "static/chunks/2008ffcf9e5b170c.js",
+      "static/chunks/turbopack-e50202e5674251be.js"
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/attendees/page": "/attendees",
+  "/auth/callback/page": "/auth/callback",
+  "/dashboard/page": "/dashboard",
+  "/evaluation/[token]/page": "/evaluation/[token]",
+  "/favicon.ico/route": "/favicon.ico",
+  "/login/page": "/login",
+  "/missing-trainings/page": "/missing-trainings",
+  "/page": "/",
+  "/trainings/[id]/page": "/trainings/[id]",
+  "/trainings/page": "/trainings"
+}
