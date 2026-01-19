@@ -19,16 +19,16 @@ interface TrackingTableProps {
 
 function StatusBadge({ status }: { status: TrainingSession["status"] }) {
   const config = {
-    pending_manager: {
+    PENDING_MANAGER: {
       label: "Pending Manager",
       className: "bg-amber-500/15 text-amber-400 border-amber-500/30 hover:bg-amber-500/20",
     },
-    manager_submitted: {
-      label: "Manager Submitted",
+    PENDING_HR_BP: {
+      label: "Pending HR BP",
       className: "bg-info/15 text-info border-info/30 hover:bg-info/20",
     },
-    hr_approved: {
-      label: "HR Approved",
+    COMPLETED: {
+      label: "Completed",
       className: "bg-success/15 text-success border-success/30 hover:bg-success/20",
     },
   }
@@ -143,7 +143,7 @@ export function TrackingTable({
                   <StatusBadge status={session.status} />
                 </TableCell>
                 <TableCell className="text-right">
-                  {session.status === "pending_manager" && (
+                  {session.status === "PENDING_MANAGER" && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -154,7 +154,7 @@ export function TrackingTable({
                       Resend Nudge
                     </Button>
                   )}
-                  {session.status === "manager_submitted" && (
+                  {session.status === "PENDING_HR_BP" && (
                     <Button
                       variant="default"
                       size="sm"
@@ -165,7 +165,7 @@ export function TrackingTable({
                       Review & Approve
                     </Button>
                   )}
-                  {session.status === "hr_approved" && (
+                  {session.status === "COMPLETED" && (
                     <Button
                       variant="ghost"
                       size="sm"

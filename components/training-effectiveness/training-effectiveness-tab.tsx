@@ -1,123 +1,71 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { ControlHeader } from "./control-header"
 import { SummaryRibbon } from "./summary-ribbon"
 import { TrackingTable } from "./tracking-table"
 import { ReviewDrawer } from "./review-drawer"
-import type { TrainingSession, EvaluationStatus } from "./types"
+import { TrainingEffectivenessEvaluationService } from "@/services/tee/training-effectiveness-evaluation-service"
+import type { TrainingSession, EvaluationStatus, TrainingEffectivenessEvaluation } from "./types"
+import { toast } from "sonner"
+import { Loader2 } from "lucide-react"
 
-const mockData: TrainingSession[] = [
-  {
-    id: "1",
-    sessionName: "Q1 Leadership Workshop",
-    managerName: "Sarah Jenkins",
-    department: "Engineering",
-    dueDate: "2026-01-20",
-    status: "manager_submitted",
-    scores: { knowledge: 4.2, application: 3.8, behavior: 4.0, results: 3.5 },
-    comments:
-      "Team showed strong improvement in leadership communication skills. Recommending follow-up coaching for 2 team members.",
-  },
-  {
-    id: "2",
-    sessionName: "Agile Methodology Training",
-    managerName: "Michael Chen",
-    department: "Product",
-    dueDate: "2026-01-18",
-    status: "pending_manager",
-    scores: null,
-    comments: null,
-  },
-  {
-    id: "3",
-    sessionName: "Cybersecurity Awareness Program",
-    managerName: "Emily Rodriguez",
-    department: "IT Security",
-    dueDate: "2026-01-15",
-    status: "hr_approved",
-    scores: { knowledge: 4.5, application: 4.2, behavior: 4.3, results: 4.1 },
-    comments: "Excellent adoption of security protocols. Zero incidents reported post-training.",
-  },
-  {
-    id: "4",
-    sessionName: "Customer Service Excellence",
-    managerName: "James Wilson",
-    department: "Support",
-    dueDate: "2026-01-22",
-    status: "manager_submitted",
-    scores: { knowledge: 3.9, application: 4.0, behavior: 3.7, results: 4.2 },
-    comments: "NPS scores improved by 15% following training completion. Team engagement is high.",
-  },
-  {
-    id: "5",
-    sessionName: "Financial Compliance Update",
-    managerName: "Lisa Thompson",
-    department: "Finance",
-    dueDate: "2026-01-25",
-    status: "pending_manager",
-    scores: null,
-    comments: null,
-  },
-  {
-    id: "6",
-    sessionName: "DEI Foundations Workshop",
-    managerName: "David Park",
-    department: "HR",
-    dueDate: "2026-01-12",
-    status: "hr_approved",
-    scores: { knowledge: 4.6, application: 4.4, behavior: 4.5, results: 4.3 },
-    comments: "Strong participation and positive feedback. Team implementing inclusive practices.",
-  },
-  {
-    id: "7",
-    sessionName: "Project Management Fundamentals",
-    managerName: "Rachel Green",
-    department: "Operations",
-    dueDate: "2026-01-28",
-    status: "pending_manager",
-    scores: null,
-    comments: null,
-  },
-  {
-    id: "8",
-    sessionName: "Data Analytics Bootcamp",
-    managerName: "Kevin Brown",
-    department: "Analytics",
-    dueDate: "2026-01-19",
-    status: "manager_submitted",
-    scores: { knowledge: 4.1, application: 3.6, behavior: 3.9, results: 3.8 },
-    comments: "Team is applying new skills to dashboards. Need more practice with advanced visualizations.",
-  },
-  {
-    id: "9",
-    sessionName: "Communication Skills Masterclass",
-    managerName: "Amanda Foster",
-    department: "Sales",
-    dueDate: "2026-01-16",
-    status: "manager_submitted",
-    scores: { knowledge: 4.3, application: 4.5, behavior: 4.2, results: 4.6 },
-    comments: "Sales conversion rate increased by 12%. Team demonstrates improved client engagement.",
-  },
-  {
-    id: "10",
-    sessionName: "Change Management Training",
-    managerName: "Robert Martinez",
-    department: "Strategy",
-    dueDate: "2026-01-30",
-    status: "pending_manager",
-    scores: null,
-    comments: null,
-  },
-]
+// Helper function to map API response to component format
+const mapApiResponseToTrainingSession = (apiData: TrainingEffectivenessEvaluation): TrainingSession => {
+  // Calculate due date based on milestone (for now, using a default calculation)
+  const trainingDate = new Date(apiData.trainingSessionDate);
+  let dueDate: string;
+
+  if (apiData.milestone === "THREE_MONTH") {
+    // Add 3 months to training date
+    const dueDateObj = new Date(trainingDate);
+    dueDateObj.setMonth(dueDateObj.getMonth() + 3);
+    dueDate = dueDateObj.toISOString().split('T')[0];
+  } else {
+    // Default to 1 month after training
+    const dueDateObj = new Date(trainingDate);
+    dueDateObj.setMonth(dueDateObj.getMonth() + 1);
+    dueDate = dueDateObj.toISOString().split('T')[0];
+  }
+
+  return {
+    id: apiData.id.toString(),
+    sessionName: apiData.trainingSessionName,
+    managerName: apiData.managerName,
+    department: apiData.departmentName,
+    dueDate,
+    status: apiData.status as EvaluationStatus,
+    scores: null, // API doesn't provide scores yet
+    comments: null, // API doesn't provide comments yet
+  };
+}
 
 export function TrainingEffectivenessTab() {
-  const [sessions, setSessions] = useState<TrainingSession[]>(mockData)
+  const [sessions, setSessions] = useState<TrainingSession[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<EvaluationStatus | "all">("all")
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [reviewSession, setReviewSession] = useState<TrainingSession | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
+
+  useEffect(() => {
+    fetchTrainingEffectivenessData()
+  }, [])
+
+  const fetchTrainingEffectivenessData = async () => {
+    try {
+      setIsLoading(true)
+      const data = await TrainingEffectivenessEvaluationService.getTrainingEffectivenessEval()
+      const mappedData = data.map(mapApiResponseToTrainingSession)
+      setSessions(mappedData)
+    } catch (error) {
+      console.error('Failed to fetch training effectiveness data:', error)
+      toast.error('Failed to load training effectiveness data. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const filteredSessions = useMemo(() => {
     return sessions.filter((session) => {
@@ -134,13 +82,13 @@ export function TrainingEffectivenessTab() {
   }, [sessions, searchQuery, statusFilter])
 
   const metrics = useMemo(() => {
-    const sessionsDue = sessions.filter((s) => s.status === "pending_manager").length
+    const sessionsDue = sessions.filter((s) => s.status === "PENDING_MANAGER").length
     const totalSessions = sessions.length
     const completedByManager = sessions.filter(
-      (s) => s.status === "manager_submitted" || s.status === "hr_approved",
+      (s) => s.status === "PENDING_HR_BP" || s.status === "COMPLETED",
     ).length
     const completionRate = Math.round((completedByManager / totalSessions) * 100)
-    const pendingHRAction = sessions.filter((s) => s.status === "manager_submitted").length
+    const pendingHRAction = sessions.filter((s) => s.status === "PENDING_HR_BP").length
 
     return { sessionsDue, completionRate, pendingHRAction }
   }, [sessions])
@@ -155,7 +103,7 @@ export function TrainingEffectivenessTab() {
   }
 
   const handleApprove = (sessionId: string) => {
-    setSessions((prev) => prev.map((s) => (s.id === sessionId ? { ...s, status: "hr_approved" as const } : s)))
+    setSessions((prev) => prev.map((s) => (s.id === sessionId ? { ...s, status: "COMPLETED" as const } : s)))
     setDrawerOpen(false)
     setReviewSession(null)
   }
@@ -171,6 +119,19 @@ export function TrainingEffectivenessTab() {
 
   const handleDownloadSelected = () => {
     console.log("Downloading records for:", selectedIds)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="p-6 h-screen">
+        <div className="h-full flex items-center justify-center">
+          <div className="flex items-center space-x-2">
+            <Loader2 className="h-8 w-8 animate-spin" />
+            <span className="text-xl">Loading training effectiveness data...</span>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

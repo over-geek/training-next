@@ -36,7 +36,7 @@ export function ReviewDrawer({ open, onOpenChange, session, onApprove }: ReviewD
 
   if (!session) return null
 
-  const isApproved = session.status === "hr_approved"
+  const isApproved = session.status === "COMPLETED"
   const averageScore = session.scores
     ? (
         (session.scores.knowledge + session.scores.application + session.scores.behavior + session.scores.results) /

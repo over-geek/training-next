@@ -34,9 +34,9 @@ export function ControlHeader({ searchQuery, onSearchChange, statusFilter, onSta
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="pending_manager">Pending Manager</SelectItem>
-            <SelectItem value="manager_submitted">Manager Submitted</SelectItem>
-            <SelectItem value="hr_approved">HR Approved</SelectItem>
+            <SelectItem value="PENDING_MANAGER">Pending Manager</SelectItem>
+            <SelectItem value="PENDING_HR_BP">Pending HR BP</SelectItem>
+            <SelectItem value="COMPLETED">Completed</SelectItem>
           </SelectContent>
         </Select>
       </div>

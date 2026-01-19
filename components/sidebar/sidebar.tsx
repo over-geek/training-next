@@ -30,6 +30,11 @@ const navItems = [
     href: "/attendees",
     icon: Users,
   },
+  {
+    name: "Training Effectiveness",
+    href: "/training-effectiveness",
+    icon: Users,
+  },
 ]
 
 export function Sidebar() {

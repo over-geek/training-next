@@ -1,21 +1,26 @@
 {
   "pages": {
     "/trainings/[id]/page": [
-      "static/chunks/ff1a16fafef87110.js",
-      "static/chunks/7dd66bdf8a7e5707.js",
-      "static/chunks/d9009a6767584a08.css",
-      "static/chunks/44c67f0ed48278c1.js",
-      "static/chunks/54cf1e69375967dd.js",
-      "static/chunks/92e46f07d693b7aa.js",
-      "static/chunks/0a71eae1cc0ce87f.js",
-      "static/chunks/15de1de9d0eaf6b7.js",
-      "static/chunks/8b241b744eb8715d.js",
-      "static/chunks/b22a4f32da38fd4a.js",
-      "static/chunks/e6b0468bc5e7fb2f.js",
-      "static/chunks/8082ab48faca5ea1.js",
-      "static/chunks/c19da6693934fea1.js",
-      "static/chunks/2008ffcf9e5b170c.js",
-      "static/chunks/turbopack-e50202e5674251be.js"
+      "static/chunks/node_modules_next_dist_8db7fb1f._.js",
+      "static/chunks/app_favicon_ico_mjs_e98bdb63._.js",
+      "static/chunks/[root-of-the-server]__28bc9c2a._.css",
+      "static/chunks/node_modules_d5c551fe._.js",
+      "static/chunks/_5c6b046e._.js",
+      "static/chunks/app_layout_tsx_0a548d63._.js",
+      "static/chunks/node_modules_next_dist_client_components_builtin_global-error_58769fe2.js",
+      "static/chunks/components_charts_30251478._.js",
+      "static/chunks/_be3e5d1f._.js",
+      "static/chunks/node_modules_f754d7e4._.js",
+      "static/chunks/app_trainings_[id]_page_tsx_58769fe2._.js",
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_57d40746._.js",
+      "static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js",
+      "static/chunks/node_modules_next_dist_compiled_next-devtools_index_a9cb0712.js",
+      "static/chunks/node_modules_next_dist_compiled_5150ccfd._.js",
+      "static/chunks/node_modules_next_dist_client_cf1d9188._.js",
+      "static/chunks/node_modules_next_dist_b0daae9a._.js",
+      "static/chunks/node_modules_@swc_helpers_cjs_b3dc30d6._.js",
+      "static/chunks/_a0ff3932._.js",
+      "static/chunks/turbopack-_cdba956c._.js"
     ]
   }
 }

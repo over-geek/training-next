@@ -1,13 +1,12 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
   "/attendees/page": "app/attendees/page.js",
   "/auth/callback/page": "app/auth/callback/page.js",
   "/dashboard/page": "app/dashboard/page.js",
-  "/evaluation/[token]/page": "app/evaluation/[token]/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
   "/login/page": "app/login/page.js",
   "/missing-trainings/page": "app/missing-trainings/page.js",
   "/page": "app/page.js",
+  "/training-effectiveness/page": "app/training-effectiveness/page.js",
   "/trainings/[id]/page": "app/trainings/[id]/page.js",
   "/trainings/page": "app/trainings/page.js"
 }
