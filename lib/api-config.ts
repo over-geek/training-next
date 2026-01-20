@@ -3,8 +3,8 @@
  * Base URL and configuration for API calls
  */
 
-export const API_BASE_URL = 'https://attendance-api-backend-hkadfwaag3gjf6gy.canadacentral-01.azurewebsites.net/api';
-export const OAUTH_BASE_URL = 'https://attendance-api-backend-hkadfwaag3gjf6gy.canadacentral-01.azurewebsites.net';
+export const API_BASE_URL = 'http://localhost:8080/api';
+export const OAUTH_BASE_URL = 'http://localhost:8080';
 
 export const API_ENDPOINTS = {
   AUTH: {
@@ -39,5 +39,12 @@ export const API_ENDPOINTS = {
       UPDATE: '/training-sessions',
       DELETE: '/training-sessions',
     }
+  },
+  TRAINING_EFFECTIVENESS: {
+    EVALUATIONS: '/training-effectiveness',
+  },
+  PUBLIC_EVALUATION: {
+    GET_EVALUATION: '/public/evaluation',
+    SUBMIT_EVALUATION: '/public/evaluation/submit',
   },
 } as const;
