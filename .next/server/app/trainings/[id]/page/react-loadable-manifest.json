@@ -1,18 +1,16 @@
 {
-  "[project]/components/charts/PieChart.tsx [app-client] (ecmascript, next/dynamic entry)": {
-    "id": "[project]/components/charts/PieChart.tsx [app-client] (ecmascript, next/dynamic entry)",
+  "39249": {
+    "id": 39249,
     "files": [
-      "static/chunks/node_modules_608d55c7._.js",
-      "static/chunks/components_charts_PieChart_tsx_00f4a2ab._.js",
-      "static/chunks/components_charts_PieChart_tsx_3bbd4dda._.js"
+      "static/chunks/8ac69e3e3977e5ae.js",
+      "static/chunks/8d203776041e44f7.js"
     ]
   },
-  "[project]/components/charts/LineChart.tsx [app-client] (ecmascript, next/dynamic entry)": {
-    "id": "[project]/components/charts/LineChart.tsx [app-client] (ecmascript, next/dynamic entry)",
+  "76250": {
+    "id": 76250,
     "files": [
-      "static/chunks/node_modules_608d55c7._.js",
-      "static/chunks/components_charts_LineChart_tsx_d1e8f886._.js",
-      "static/chunks/components_charts_LineChart_tsx_3bbd4dda._.js"
+      "static/chunks/42270f59ab60c4f2.js",
+      "static/chunks/8d203776041e44f7.js"
     ]
   }
 }

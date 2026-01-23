@@ -1,25 +1,24 @@
 {
   "pages": {
     "/missing-trainings/page": [
-      "static/chunks/node_modules_next_dist_8db7fb1f._.js",
-      "static/chunks/app_favicon_ico_mjs_e98bdb63._.js",
-      "static/chunks/[root-of-the-server]__28bc9c2a._.css",
-      "static/chunks/node_modules_d5c551fe._.js",
-      "static/chunks/_5c6b046e._.js",
-      "static/chunks/app_layout_tsx_0a548d63._.js",
-      "static/chunks/node_modules_next_dist_client_components_builtin_global-error_58769fe2.js",
-      "static/chunks/_27d6fbe7._.js",
-      "static/chunks/node_modules_008c4250._.js",
-      "static/chunks/app_missing-trainings_page_tsx_58769fe2._.js",
-      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_57d40746._.js",
-      "static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js",
-      "static/chunks/node_modules_next_dist_compiled_next-devtools_index_a9cb0712.js",
-      "static/chunks/node_modules_next_dist_compiled_5150ccfd._.js",
-      "static/chunks/node_modules_next_dist_client_cf1d9188._.js",
-      "static/chunks/node_modules_next_dist_b0daae9a._.js",
-      "static/chunks/node_modules_@swc_helpers_cjs_b3dc30d6._.js",
-      "static/chunks/_a0ff3932._.js",
-      "static/chunks/turbopack-_cdba956c._.js"
+      "static/chunks/ff1a16fafef87110.js",
+      "static/chunks/fc7283cc1ce25557.js",
+      "static/chunks/2473c16c0c2f6b5f.css",
+      "static/chunks/224af1c648f28546.css",
+      "static/chunks/44c67f0ed48278c1.js",
+      "static/chunks/abded25bd18cff12.js",
+      "static/chunks/7c8ff172f2650545.js",
+      "static/chunks/6a45329a190cdbdc.js",
+      "static/chunks/a772453ca14e954b.js",
+      "static/chunks/6df913dbeaa52ce8.js",
+      "static/chunks/b2d85200208c83a1.js",
+      "static/chunks/b31795b3d27535fb.js",
+      "static/chunks/63a435f5d3c7357f.js",
+      "static/chunks/4956456c12bbd714.js",
+      "static/chunks/8082ab48faca5ea1.js",
+      "static/chunks/c19da6693934fea1.js",
+      "static/chunks/2008ffcf9e5b170c.js",
+      "static/chunks/turbopack-f3eb3135dbbe1444.js"
     ]
   }
 }

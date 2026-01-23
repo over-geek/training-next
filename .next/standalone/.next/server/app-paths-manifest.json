@@ -8,6 +8,8 @@
   "/login/page": "app/login/page.js",
   "/missing-trainings/page": "app/missing-trainings/page.js",
   "/page": "app/page.js",
+  "/tev/[token]/page": "app/tev/[token]/page.js",
+  "/training-effectiveness/page": "app/training-effectiveness/page.js",
   "/trainings/[id]/page": "app/trainings/[id]/page.js",
   "/trainings/page": "app/trainings/page.js"
 }

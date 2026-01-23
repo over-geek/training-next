@@ -28,6 +28,14 @@
       "namedRegex": "^/evaluation/(?<nxtPtoken>[^/]+?)(?:/)?$"
     },
     {
+      "page": "/tev/[token]",
+      "regex": "^/tev/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPtoken": "nxtPtoken"
+      },
+      "namedRegex": "^/tev/(?<nxtPtoken>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/trainings/[id]",
       "regex": "^/trainings/([^/]+?)(?:/)?$",
       "routeKeys": {
@@ -84,6 +92,12 @@
       "regex": "^/missing\\-trainings(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/missing\\-trainings(?:/)?$"
+    },
+    {
+      "page": "/training-effectiveness",
+      "regex": "^/training\\-effectiveness(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/training\\-effectiveness(?:/)?$"
     },
     {
       "page": "/trainings",
