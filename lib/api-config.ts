@@ -40,4 +40,11 @@ export const API_ENDPOINTS = {
       DELETE: '/training-sessions',
     }
   },
+  TRAINING_EFFECTIVENESS: {
+    EVALUATIONS: '/training-effectiveness',
+  },
+  PUBLIC_EVALUATION: {
+    GET_EVALUATION: '/public/evaluation',
+    SUBMIT_EVALUATION: '/public/evaluation/submit',
+  },
 } as const;

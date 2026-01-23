@@ -8,6 +8,8 @@
   "/login/page": "/login",
   "/missing-trainings/page": "/missing-trainings",
   "/page": "/",
+  "/tev/[token]/page": "/tev/[token]",
+  "/training-effectiveness/page": "/training-effectiveness",
   "/trainings/[id]/page": "/trainings/[id]",
   "/trainings/page": "/trainings"
 }
