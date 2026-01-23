@@ -1,4 +1,4 @@
-export type EvaluationStatus = "PENDING_MANAGER" | "PENDING_HR_BP" | "COMPLETED"
+export type EvaluationStatus = "PENDING_MANAGER" | "PENDING_SIGNATURES" | "COMPLETED"
 
 export interface TrainingSession {
   id: string

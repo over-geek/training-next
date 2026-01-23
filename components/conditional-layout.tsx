@@ -11,7 +11,7 @@ const NO_SIDEBAR_ROUTES = ['/login'];
 
 export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname();
-  const shouldShowSidebar = !NO_SIDEBAR_ROUTES.includes(pathname) && !pathname.startsWith('/evaluation');
+  const shouldShowSidebar = !NO_SIDEBAR_ROUTES.includes(pathname) && !pathname.startsWith('/evaluation') && !pathname.startsWith('/tev');
 
   if (shouldShowSidebar) {
     return (

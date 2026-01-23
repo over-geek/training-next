@@ -63,7 +63,7 @@ export function ReviewDrawer({ open, onOpenChange, session, onApprove }: ReviewD
           </SheetDescription>
         </SheetHeader>
 
-        <div className="mt-6 space-y-6">
+        <div className="mt-6 space-y-6 px-3">
           {/* Session Details */}
           <div className="rounded-lg border border-border bg-card p-4 space-y-3">
             <h3 className="font-medium text-foreground">Session Details</h3>
@@ -186,7 +186,7 @@ export function ReviewDrawer({ open, onOpenChange, session, onApprove }: ReviewD
                   placeholder="Enter your full name"
                   value={signature}
                   onChange={(e) => setSignature(e.target.value)}
-                  className="bg-secondary border-border"
+                  className="bg-secondary border-border mt-3"
                 />
               </div>
               <Button
@@ -205,7 +205,7 @@ export function ReviewDrawer({ open, onOpenChange, session, onApprove }: ReviewD
             <div className="rounded-lg border border-success/30 bg-success/10 p-4">
               <div className="flex items-center gap-2 text-success">
                 <CheckCircle2 className="h-5 w-5" />
-                <p className="font-medium">This evaluation has been approved by HR</p>
+                <p className="font-medium">This evaluation completed by manager.</p>
               </div>
             </div>
           )}

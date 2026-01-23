@@ -23,8 +23,8 @@ function StatusBadge({ status }: { status: TrainingSession["status"] }) {
       label: "Pending Manager",
       className: "bg-amber-500/15 text-amber-400 border-amber-500/30 hover:bg-amber-500/20",
     },
-    PENDING_HR_BP: {
-      label: "Pending HR BP",
+    PENDING_SIGNATURES: {
+      label: "Pending Signatures",
       className: "bg-info/15 text-info border-info/30 hover:bg-info/20",
     },
     COMPLETED: {
@@ -33,7 +33,12 @@ function StatusBadge({ status }: { status: TrainingSession["status"] }) {
     },
   }
 
-  const { label, className } = config[status]
+  const statusConfig = config[status] || {
+    label: status || "Unknown",
+    className: "bg-gray-500/15 text-gray-400 border-gray-500/30 hover:bg-gray-500/20",
+  }
+
+  const { label, className } = statusConfig
 
   return (
     <Badge variant="outline" className={className}>
@@ -154,7 +159,7 @@ export function TrackingTable({
                       Resend Nudge
                     </Button>
                   )}
-                  {session.status === "PENDING_HR_BP" && (
+                  {session.status === "PENDING_SIGNATURES" && (
                     <Button
                       variant="default"
                       size="sm"
