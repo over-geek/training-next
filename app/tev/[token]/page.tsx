@@ -105,7 +105,11 @@ export default function ManagerEvaluationPage() {
         }))
       }
 
-      await PublicEvaluationService.submitEvaluation(token, submissionData)
+      const result = await PublicEvaluationService.submitEvaluation(token, submissionData);
+
+      if (result.signingUrl) {
+        window.location.href = result.signingUrl;
+      }
 
       setIsSubmitted(true)
       toast.success('Thank you! Your team evaluation has been submitted successfully.')
