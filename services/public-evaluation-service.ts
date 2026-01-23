@@ -61,7 +61,7 @@ export class PublicEvaluationService {
 
   static async submitEvaluation(token: string, evaluationData: EvaluationSubmission): Promise<{ signingUrl: string; message: string }> {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/public/evaluation/submit`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://attendance-api-backend-hkadfwaag3gjf6gy.canadacentral-01.azurewebsites.net'}/api/public/evaluation/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ export class PublicEvaluationService {
       }
 
       const result = await response.json();
-      return result; // Returns { signingUrl: string, message: string }
+      return result;
 
     } catch (error) {
       console.error('Failed to submit evaluation:', error);
