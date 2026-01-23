@@ -59,19 +59,26 @@ export class PublicEvaluationService {
     }
   }
 
-  static async submitEvaluation(token: string, evaluationData: EvaluationSubmission): Promise<void> {
+  static async submitEvaluation(token: string, evaluationData: EvaluationSubmission): Promise<{ signingUrl: string; message: string }> {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/public/evaluation/submit?token=${token}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/public/evaluation/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(evaluationData),
+        body: JSON.stringify({
+          ...evaluationData
+        }),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
+
+      const result = await response.json();
+      return result; // Returns { signingUrl: string, message: string }
+
     } catch (error) {
       console.error('Failed to submit evaluation:', error);
       throw error;
