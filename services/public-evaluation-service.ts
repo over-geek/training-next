@@ -1,4 +1,5 @@
-import { api } from '@/lib/auth-service';
+import { API_BASE_URL } from "@/lib/api-config";
+
 
 // Types for public evaluation API responses
 export interface EvaluationData {
@@ -48,7 +49,7 @@ export interface EvaluationSubmission {
 export class PublicEvaluationService {
   static async getEvaluationByToken(token: string): Promise<EvaluationData> {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/public/evaluation/${token}`);
+      const response = await fetch(`${API_BASE_URL}/public/evaluation/${token}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -61,7 +62,7 @@ export class PublicEvaluationService {
 
   static async submitEvaluation(token: string, evaluationData: EvaluationSubmission): Promise<{ signingUrl: string; message: string }> {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://attendance-api-backend-hkadfwaag3gjf6gy.canadacentral-01.azurewebsites.net'}/api/public/evaluation/submit`, {
+      const response = await fetch(`${API_BASE_URL}/public/evaluation/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
