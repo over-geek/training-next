@@ -52,7 +52,7 @@ class WebSocketService {
         throw new Error('No authentication token found');
       }
 
-      this.ws = new WebSocket(`ws://${OAUTH_BASE_URL}/ws?token=${token}`);
+      this.ws = new WebSocket(`wss://${OAUTH_BASE_URL}/ws?token=${token}`);
       
       this.ws.onopen = () => {
         console.log('WebSocket connection established');
