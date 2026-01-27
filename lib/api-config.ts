@@ -5,6 +5,7 @@
 
 export const API_BASE_URL = 'https://attendance-api-backend-hkadfwaag3gjf6gy.canadacentral-01.azurewebsites.net/api';
 export const OAUTH_BASE_URL = 'https://attendance-api-backend-hkadfwaag3gjf6gy.canadacentral-01.azurewebsites.net';
+export const WEBSOCKET_BASE_URL = 'attendance-api-backend-hkadfwaag3gjf6gy.canadacentral-01.azurewebsites.net'
 
 export const API_ENDPOINTS = {
   AUTH: {

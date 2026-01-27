@@ -1,5 +1,5 @@
 import { toast } from 'sonner'
-import { OAUTH_BASE_URL } from './api-config';
+import { WEBSOCKET_BASE_URL } from './api-config';
 
 export interface WebSocketMessage {
   type: 'ATTENDANCE' | 'ERROR' | 'PING' | 'PONG';
@@ -52,7 +52,7 @@ class WebSocketService {
         throw new Error('No authentication token found');
       }
 
-      this.ws = new WebSocket(`wss://${OAUTH_BASE_URL}/ws?token=${token}`);
+      this.ws = new WebSocket(`wss://${WEBSOCKET_BASE_URL}/ws?token=${token}`);
       
       this.ws.onopen = () => {
         console.log('WebSocket connection established');
