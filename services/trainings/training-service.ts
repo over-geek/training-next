@@ -103,7 +103,7 @@ export class TrainingService {
 
   static async startTrainingSession(trainingId: number): Promise<void> {
     try {
-      await api.post(`/card-reader/start-session/${trainingId}`);
+      await api.post(`/training-sessions/${trainingId}/start-session`);
     } catch (error) {
       console.error(`Failed to start training session ${trainingId}:`, error);
       throw error;
@@ -112,7 +112,7 @@ export class TrainingService {
 
   static async endTrainingSession(trainingId: number): Promise<void> {
     try {
-      await api.post(`/card-reader/end-session/${trainingId}`);
+      await api.post(`/training-sessions/${trainingId}/stop-session`);
     } catch (error) {
       console.error(`Failed to end training session ${trainingId}:`, error);
       throw error;
