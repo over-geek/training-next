@@ -134,14 +134,8 @@ export default function TrainingDetailsPage() {
     
     try {
       setIsUpdatingStatus(true)
-      await Promise.all([
-        TrainingService.startTrainingSession(training.id),
-        TrainingService.updateTrainingSession({
-          id: training.id,
-          status: 'in-progress'
-        })
-      ])
-      
+      await TrainingService.startTrainingSession(training.id)
+
       setTraining(prev => prev ? { ...prev, status: 'in-progress' } : null)
       toast.success('Training session started successfully!')
       
@@ -168,13 +162,7 @@ export default function TrainingDetailsPage() {
       setIsUpdatingStatus(true)
       
       webSocketService.disconnect()
-      await Promise.all([
-        TrainingService.endTrainingSession(training.id),
-        TrainingService.updateTrainingSession({
-          id: training.id,
-          status: 'done'
-        })
-      ])
+      await TrainingService.endTrainingSession(training.id)
       setTraining(prev => prev ? { ...prev, status: 'done' } : null)
       toast.success('Training session ended successfully!')
       
