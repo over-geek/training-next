@@ -123,14 +123,15 @@ export default function AttendeesPage() {
     
     try {
       if (selectedAttendee.status === "inactive") {
-        setIsCardScanning(true)
-        await new Promise(resolve => setTimeout(resolve, 3000))
-        
         const cardResult = await EmployeeService.updateEmployeeCard(selectedAttendee.id)
         if (!cardResult) {
           toast.error('Failed to register card. Please try again.')
           return
         }
+        
+        setIsCardScanning(true)
+        await new Promise(resolve => setTimeout(resolve, 3000))
+        
         setIsCardScanning(false)
         setIsUpdatingStatus(true)
         
