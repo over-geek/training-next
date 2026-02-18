@@ -96,13 +96,13 @@ export class EmployeeService {
   /**
    * Update employee card information
    */
-  static async updateEmployeeCard(id: number, cardData?: any): Promise<Employee> {
+  static async updateEmployeeCard(id: number, cardData?: any): Promise<String> {
     try {
-      const response = await api.post<Employee>(`/employees/${id}/update-card`, cardData || {});
+      const response = await api.post<String>(`/employees/${id}/update-card`, cardData || {});
       return response.data;
-    } catch (error) {
-      console.error(`Failed to update card for employee ${id}:`, error);
-      throw error;
+    } catch (error: any) {
+      const message = error.response?.data || 'Failed to update card. Please try again.';
+      throw new Error(message);
     }
   }
 }

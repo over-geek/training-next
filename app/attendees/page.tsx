@@ -123,10 +123,12 @@ export default function AttendeesPage() {
     
     try {
       if (selectedAttendee.status === "inactive") {
-        const cardResult = await EmployeeService.updateEmployeeCard(selectedAttendee.id)
-        if (!cardResult) {
-          toast.error('Failed to register card. Please try again.')
-          return
+        try {
+          const message = await EmployeeService.updateEmployeeCard(selectedAttendee.id);
+          toast.success(message);
+        } catch (error: any) {
+          toast.error(error.message);
+          return;
         }
         
         setIsCardScanning(true)
