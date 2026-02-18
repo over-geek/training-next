@@ -123,21 +123,22 @@ export default function AttendeesPage() {
     
     try {
       if (selectedAttendee.status === "inactive") {
+        setIsCardScanning(true)
         try {
           const message = await EmployeeService.updateEmployeeCard(selectedAttendee.id);
           toast.success(message);
         } catch (error: any) {
-          toast.error(error.message);
+          const errorMessage = error?.message || error?.toString() || 'Failed to update card';
+          console.error('Card update error:', error);
+          toast.error(errorMessage);
           return;
         }
         
-        setIsCardScanning(true)
-        await new Promise(resolve => setTimeout(resolve, 3000))
-        
+        await EmployeeService.toggleEmployeeStatus(selectedAttendee.id)
         setIsCardScanning(false)
         setIsUpdatingStatus(true)
         
-        await EmployeeService.toggleEmployeeStatus(selectedAttendee.id)
+        
         await fetchEmployees()
         const employees = await EmployeeService.getEmployees()
         const updatedEmployee = employees.find(emp => emp.id === selectedAttendee.id)
