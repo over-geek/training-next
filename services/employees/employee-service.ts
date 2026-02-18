@@ -98,10 +98,13 @@ export class EmployeeService {
    */
   static async updateEmployeeCard(id: number, cardData?: any): Promise<String> {
     try {
-      const response = await api.post<String>(`/employees/${id}/update-card`, cardData || {});
-      return response.data;
+      const response = await api.post<{ success: boolean; message: string }>(
+        `/employees/${id}/update-card`,
+        {}
+      );
+      return response.data.message;
     } catch (error: any) {
-      const message = error.response?.data || 'Failed to update card. Please try again.';
+      const message = error?.message || 'Failed to update card. Please try again.';
       throw new Error(message);
     }
   }
