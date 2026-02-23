@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ConditionalLayout } from "@/components/conditional-layout";
+import { AppInitializer } from "@/components/app-initializer";
 import { ThemeProvider } from "@/lib/theme-provider";
 import { Toaster } from "sonner";
 import "./globals.css";
@@ -34,6 +35,7 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="system"
         >
+          <AppInitializer />
           <ConditionalLayout>
             {children}
           </ConditionalLayout>
