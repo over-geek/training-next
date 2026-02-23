@@ -137,8 +137,7 @@ export default function AttendeesPage() {
         await EmployeeService.toggleEmployeeStatus(selectedAttendee.id)
         setIsCardScanning(false)
         setIsUpdatingStatus(true)
-        
-        
+
         await fetchEmployees()
         const employees = await EmployeeService.getEmployees()
         const updatedEmployee = employees.find(emp => emp.id === selectedAttendee.id)
