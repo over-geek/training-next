@@ -98,9 +98,10 @@ export class EmployeeService {
    */
   static async updateEmployeeCard(id: number, cardData?: any): Promise<String> {
     try {
+      const machineId = localStorage.getItem('local_machine_id');
       const response = await api.post<{ success: boolean; message: string }>(
         `/employees/${id}/update-card`,
-        {}
+        { machineId, ...cardData }
       );
       return response.data.message;
     } catch (error: any) {
