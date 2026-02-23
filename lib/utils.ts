@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export async function initMachineId() {
     try {
-        const response = await fetch('https://localhost:5174/machine-id');
+        const response = await fetch('http://localhost:5174/machine-id');
         const data = await response.json();
         
         localStorage.setItem('local_machine_id', data.machineId);
