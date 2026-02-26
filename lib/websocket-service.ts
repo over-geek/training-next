@@ -2,7 +2,7 @@ import { toast } from 'sonner'
 import { WEBSOCKET_BASE_URL } from './api-config';
 
 export interface WebSocketMessage {
-  type: 'ATTENDANCE' | 'ERROR' | 'PING' | 'PONG';
+  type: 'ATTENDANCE' | 'ERROR' | 'PING' | 'PONG' | 'REGISTER';
   data?: {
     name: string;
     department: string;
@@ -52,11 +52,17 @@ class WebSocketService {
         throw new Error('No authentication token found');
       }
 
-      this.ws = new WebSocket(`wss://${WEBSOCKET_BASE_URL}/ws?token=${token}`);
+      const machineId = localStorage.getItem('local_machine_id');
+      const machineIdParam = machineId ? `&machineId=${encodeURIComponent(machineId)}` : '';
+
+      this.ws = new WebSocket(`wss://${WEBSOCKET_BASE_URL}/ws?token=${token}${machineIdParam}`);
       
       this.ws.onopen = () => {
         console.log('WebSocket connection established');
         this.reconnectAttempts = 0;
+        if (machineId) {
+          this.send({ type: 'REGISTER', machineId } as any);
+        }
         this.send({
           type: 'PING',
         });
