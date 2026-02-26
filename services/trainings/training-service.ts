@@ -103,7 +103,8 @@ export class TrainingService {
 
   static async startTrainingSession(trainingId: number): Promise<void> {
     try {
-      await api.post(`/training-sessions/${trainingId}/start-session`);
+      const machineId = localStorage.getItem('local_machine_id');
+      await api.post(`/training-sessions/${trainingId}/start-session`, { machineId });
     } catch (error) {
       console.error(`Failed to start training session ${trainingId}:`, error);
       throw error;
@@ -112,7 +113,8 @@ export class TrainingService {
 
   static async endTrainingSession(trainingId: number): Promise<void> {
     try {
-      await api.post(`/training-sessions/${trainingId}/stop-session`);
+      const machineId = localStorage.getItem('local_machine_id')
+      await api.post(`/training-sessions/${trainingId}/stop-session`, { machineId });
     } catch (error) {
       console.error(`Failed to end training session ${trainingId}:`, error);
       throw error;
