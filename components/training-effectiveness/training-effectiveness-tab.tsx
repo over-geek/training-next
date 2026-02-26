@@ -4,25 +4,20 @@ import { useState, useMemo, useEffect } from "react"
 import { ControlHeader } from "./control-header"
 import { SummaryRibbon } from "./summary-ribbon"
 import { TrackingTable } from "./tracking-table"
-import { ReviewDrawer } from "./review-drawer"
 import { TrainingEffectivenessEvaluationService } from "@/services/tee/training-effectiveness-evaluation-service"
 import type { TrainingSession, EvaluationStatus, TrainingEffectivenessEvaluation } from "./types"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
 
-// Helper function to map API response to component format
 const mapApiResponseToTrainingSession = (apiData: TrainingEffectivenessEvaluation): TrainingSession => {
-  // Calculate due date based on milestone (for now, using a default calculation)
   const trainingDate = new Date(apiData.trainingSessionDate);
   let dueDate: string;
 
   if (apiData.milestone === "THREE_MONTH") {
-    // Add 3 months to training date
     const dueDateObj = new Date(trainingDate);
     dueDateObj.setMonth(dueDateObj.getMonth() + 3);
     dueDate = dueDateObj.toISOString().split('T')[0];
   } else {
-    // Default to 1 month after training
     const dueDateObj = new Date(trainingDate);
     dueDateObj.setMonth(dueDateObj.getMonth() + 1);
     dueDate = dueDateObj.toISOString().split('T')[0];
@@ -35,8 +30,6 @@ const mapApiResponseToTrainingSession = (apiData: TrainingEffectivenessEvaluatio
     department: apiData.departmentName,
     dueDate,
     status: apiData.status as EvaluationStatus,
-    scores: null, // API doesn't provide scores yet
-    comments: null, // API doesn't provide comments yet
   };
 }
 
@@ -46,8 +39,6 @@ export function TrainingEffectivenessTab() {
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<EvaluationStatus | "all">("all")
   const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const [reviewSession, setReviewSession] = useState<TrainingSession | null>(null)
-  const [drawerOpen, setDrawerOpen] = useState(false)
 
   useEffect(() => {
     fetchTrainingEffectivenessData()
@@ -97,22 +88,6 @@ export function TrainingEffectivenessTab() {
     console.log("Sending nudge for session:", sessionId)
   }
 
-  const handleReviewApprove = (session: TrainingSession) => {
-    setReviewSession(session)
-    setDrawerOpen(true)
-  }
-
-  const handleApprove = (sessionId: string) => {
-    setSessions((prev) => prev.map((s) => (s.id === sessionId ? { ...s, status: "COMPLETED" as const } : s)))
-    setDrawerOpen(false)
-    setReviewSession(null)
-  }
-
-  const handleViewRecord = (session: TrainingSession) => {
-    setReviewSession(session)
-    setDrawerOpen(true)
-  }
-
   const handleSelectionChange = (ids: string[]) => {
     setSelectedIds(ids)
   }
@@ -154,12 +129,8 @@ export function TrainingEffectivenessTab() {
         selectedIds={selectedIds}
         onSelectionChange={handleSelectionChange}
         onResendNudge={handleResendNudge}
-        onReviewApprove={handleReviewApprove}
-        onViewRecord={handleViewRecord}
         onDownloadSelected={handleDownloadSelected}
       />
-
-      <ReviewDrawer open={drawerOpen} onOpenChange={setDrawerOpen} session={reviewSession} onApprove={handleApprove} />
     </div>
   )
 }

@@ -1,4 +1,4 @@
-export type EvaluationStatus = "PENDING_MANAGER" | "PENDING_SIGNATURES" | "COMPLETED"
+export type EvaluationStatus = "PENDING_MANAGER" | "PENDING_SIGNATURES" | "COMPLETED" | "PENDING_HR_BP"
 
 export interface TrainingSession {
   id: string
@@ -7,13 +7,6 @@ export interface TrainingSession {
   department: string
   dueDate: string
   status: EvaluationStatus
-  scores: {
-    knowledge: number
-    application: number
-    behavior: number
-    results: number
-  } | null
-  comments: string | null
 }
 
 // API response type

@@ -1,6 +1,6 @@
 "use client"
 
-import { Download, Send, Eye, ClipboardCheck } from "lucide-react"
+import { Download, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -12,24 +12,26 @@ interface TrackingTableProps {
   selectedIds: string[]
   onSelectionChange: (ids: string[]) => void
   onResendNudge: (sessionId: string) => void
-  onReviewApprove: (session: TrainingSession) => void
-  onViewRecord: (session: TrainingSession) => void
   onDownloadSelected: () => void
 }
 
 function StatusBadge({ status }: { status: TrainingSession["status"] }) {
-  const config = {
+  const config: Record<TrainingSession["status"], { label: string; className: string }> = {
     PENDING_MANAGER: {
       label: "Pending Manager",
       className: "bg-amber-500/15 text-amber-400 border-amber-500/30 hover:bg-amber-500/20",
     },
     PENDING_SIGNATURES: {
       label: "Pending Signatures",
-      className: "bg-info/15 text-info border-info/30 hover:bg-info/20",
+      className: "bg-amber-500/15 text-amber-400 border-amber-500/30 hover:bg-amber-500/20",
     },
     COMPLETED: {
       label: "Completed",
-      className: "bg-success/15 text-success border-success/30 hover:bg-success/20",
+      className: "bg-green-500 text-white border-green-500/30 hover:bg-green-500/20",
+    },
+    PENDING_HR_BP: {
+      label: "Pending HR/BP",
+      className: "bg-blue-500/15 text-blue-400 border-blue-500/30 hover:bg-blue-500/20",
     },
   }
 
@@ -60,8 +62,6 @@ export function TrackingTable({
   selectedIds,
   onSelectionChange,
   onResendNudge,
-  onReviewApprove,
-  onViewRecord,
   onDownloadSelected,
 }: TrackingTableProps) {
   const allSelected = sessions.length > 0 && selectedIds.length === sessions.length
@@ -148,39 +148,16 @@ export function TrackingTable({
                   <StatusBadge status={session.status} />
                 </TableCell>
                 <TableCell className="text-right">
-                  {session.status === "PENDING_MANAGER" && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onResendNudge(session.id)}
-                      className="gap-2 text-muted-foreground hover:text-foreground"
-                    >
-                      <Send className="h-4 w-4" />
-                      Resend Nudge
-                    </Button>
-                  )}
-                  {session.status === "PENDING_SIGNATURES" && (
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={() => onReviewApprove(session)}
-                      className="gap-2 bg-info text-info-foreground hover:bg-info/90"
-                    >
-                      <ClipboardCheck className="h-4 w-4" />
-                      Review & Approve
-                    </Button>
-                  )}
-                  {session.status === "COMPLETED" && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onViewRecord(session)}
-                      className="gap-2 text-muted-foreground hover:text-foreground"
-                    >
-                      <Eye className="h-4 w-4" />
-                      View Record
-                    </Button>
-                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onResendNudge(session.id)}
+                    disabled={session.status !== "PENDING_MANAGER"}
+                    className="gap-2 text-muted-foreground hover:text-foreground cursor-pointer"
+                  >
+                    <Send className="h-4 w-4" />
+                    Resend Nudge
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}

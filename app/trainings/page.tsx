@@ -326,10 +326,6 @@ export default function TrainingsPage() {
                             <Edit className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleAction("start", training.id)}>
-                            <Play className="mr-2 h-4 w-4" />
-                            Start Session
-                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleAction("responses", training.id, training.trainingName)}>
                             <MessageSquare className="mr-2 h-4 w-4" />
                             Take Responses
