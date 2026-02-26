@@ -1,12 +1,8 @@
 {
   "version": 4,
   "routes": {
-    "/favicon.ico": {
-      "initialHeaders": {
-        "cache-control": "public, max-age=0, must-revalidate",
-        "content-type": "image/x-icon",
-        "x-next-cache-tags": "_N_T_/layout,_N_T_/favicon.ico/layout,_N_T_/favicon.ico/route,_N_T_/favicon.ico"
-      },
+    "/_not-found": {
+      "initialStatus": 404,
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -19,32 +15,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/favicon.ico",
-      "dataRoute": null,
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/",
-      "dataRoute": "/index.rsc",
+      "srcRoute": "/_not-found",
+      "dataRoute": "/_not-found.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -78,7 +50,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/missing-trainings": {
+    "/": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -91,32 +63,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/missing-trainings",
-      "dataRoute": "/missing-trainings.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/login": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/login",
-      "dataRoute": "/login.rsc",
+      "srcRoute": "/",
+      "dataRoute": "/index.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -150,8 +98,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/_not-found": {
-      "initialStatus": 404,
+    "/training-effectiveness": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -164,8 +111,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/_not-found",
-      "dataRoute": "/_not-found.rsc",
+      "srcRoute": "/training-effectiveness",
+      "dataRoute": "/training-effectiveness.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -199,6 +146,35 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/favicon.ico": {
+      "initialHeaders": {
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-type": "image/x-icon",
+        "x-next-cache-tags": "_N_T_/layout,_N_T_/favicon.ico/layout,_N_T_/favicon.ico/route,_N_T_/favicon.ico"
+      },
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/favicon.ico",
+      "dataRoute": null,
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/trainings": {
       "experimentalBypassFor": [
         {
@@ -223,7 +199,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/training-effectiveness": {
+    "/login": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -236,8 +212,32 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/training-effectiveness",
-      "dataRoute": "/training-effectiveness.rsc",
+      "srcRoute": "/login",
+      "dataRoute": "/login.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/missing-trainings": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/missing-trainings",
+      "dataRoute": "/missing-trainings.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -251,8 +251,8 @@
   "dynamicRoutes": {},
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "15c395ed89c19e273152a05a47cddbcd",
-    "previewModeSigningKey": "08602a1861e8e07758f7e84246c52adb15249d87b9e93c9edc7b7053a00c9c3a",
-    "previewModeEncryptionKey": "dd578b819a882f0e050cc06c314d79e2a42225aeb356ffb406f8a8e2e162efca"
+    "previewModeId": "50e6a1e5ce0076667fdd36971822d088",
+    "previewModeSigningKey": "52dcf290c78782031d4b8a6adbd15c3b4875f95a286f2dfc21094d6bd1d6eb34",
+    "previewModeEncryptionKey": "83bde4088c5dd2530d89d3ef484014834fce2764bb816bc69dd19e049d98b5b6"
   }
 }
