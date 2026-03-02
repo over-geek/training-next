@@ -1,8 +1,8 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { Search, Plus, Calendar, Users, BookOpen, Clock, MoreHorizontal, Trash2, Edit, Play, FileDown, Filter, Loader2, MessageSquare } from "lucide-react"
-import { CheckIcon, PlusCircledIcon, CalendarIcon } from "@radix-ui/react-icons"
+import React, { useState } from "react"
+import { Search, Plus, Calendar, Users, BookOpen, Clock, MoreHorizontal, Trash2, Edit, FileDown, Loader2, MessageSquare } from "lucide-react"
+import { PlusCircledIcon } from "@radix-ui/react-icons"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -13,6 +13,7 @@ import { FilterPopover } from "@/components/ui/filter-popover"
 import { AddTrainingSessionDialog } from "@/components/add-training-session-dialog"
 import { useRouter } from "next/navigation"
 import { TrainingService } from "@/services/trainings/training-service"
+import { useTrainingSessions, useDeleteTrainingSession } from "@/hooks/queries"
 import type { TrainingSession } from "@/services/trainings/types"
 import { toast } from "sonner"
 import { QRCodeDialog } from "@/components/qr-code-dialog"
@@ -24,29 +25,13 @@ export default function TrainingsPage() {
   const [audienceFilter, setAudienceFilter] = useState("")
   const [dateFilter, setDateFilter] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-  const [trainings, setTrainings] = useState<TrainingSession[]>([])
-  const [isLoading, setIsLoading] = useState(true)
   const [isQRDialogOpen, setIsQRDialogOpen] = useState(false)
   const [selectedTrainingId, setSelectedTrainingId] = useState<number | null>(null)
   const [selectedTrainingName, setSelectedTrainingName] = useState<string>("")
   const itemsPerPage = 5
 
-  useEffect(() => {
-    fetchTrainingSessions()
-  }, [])
-
-  const fetchTrainingSessions = async () => {
-    try {
-      setIsLoading(true)
-      const data = await TrainingService.getTrainingSessions()
-      setTrainings(data)
-    } catch (error) {
-      console.error('Failed to fetch training sessions:', error)
-      toast.error('Failed to load training sessions. Please try again.')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const { data: trainings = [], isLoading } = useTrainingSessions()
+  const deleteMutation = useDeleteTrainingSession()
 
   const filteredData = trainings.filter(training => {
     const matchesSearch = training.trainingName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -54,7 +39,6 @@ export default function TrainingsPage() {
     const matchesType = !typeFilter || typeFilter === "all" || training.trainingType === typeFilter
     const matchesAudience = !audienceFilter || audienceFilter === "all" || training.audienceType === audienceFilter
     const matchesDate = !dateFilter || dateFilter === "all" || training.date >= dateFilter
-    
     return matchesSearch && matchesStatus && matchesType && matchesAudience && matchesDate
   })
 
@@ -82,28 +66,21 @@ export default function TrainingsPage() {
 
   const handleAction = async (action: string, trainingId: number, trainingName?: string) => {
     if (action === "delete") {
-      try {
-        await TrainingService.deleteTrainingSession(trainingId)
-        await fetchTrainingSessions()
-        toast.success('Training session deleted successfully!')
-      } catch (error) {
-        console.error('Failed to delete training session:', error)
-        toast.error('Failed to delete training session. Please try again.')
-      }
+      deleteMutation.mutate(trainingId, {
+        onSuccess: () => toast.success('Training session deleted successfully!'),
+        onError: () => toast.error('Failed to delete training session. Please try again.'),
+      })
     } else if (action === "export") {
       try {
         await TrainingService.exportAttendanceLogsPDF(trainingId)
         toast.success('Attendance logs exported successfully!')
-      } catch (error) {
-        console.error('Failed to export attendance logs:', error)
+      } catch {
         toast.error('Failed to export attendance logs. Please try again.')
       }
     } else if (action === "responses") {
       setSelectedTrainingId(trainingId)
       setSelectedTrainingName(trainingName || "")
       setIsQRDialogOpen(true)
-    } else {
-      console.log(`${action} action for training ID: ${trainingId}`)
     }
   }
 
@@ -116,8 +93,8 @@ export default function TrainingsPage() {
     setCurrentPage(1)
   }
 
-  const handleAddTraining = async () => {
-    await fetchTrainingSessions()
+  // After add, TanStack Query invalidation handles the refresh automatically
+  const handleAddTraining = () => {
     setCurrentPage(1)
   }
 
@@ -132,39 +109,28 @@ export default function TrainingsPage() {
             <CardTitle className="text-sm font-medium">Upcoming Trainings</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{upcomingTrainings}</div>
-          </CardContent>
+          <CardContent><div className="text-2xl font-bold">{upcomingTrainings}</div></CardContent>
         </Card>
-        
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Trainings This Year</CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{trainingsThisYear}</div>
-          </CardContent>
+          <CardContent><div className="text-2xl font-bold">{trainingsThisYear}</div></CardContent>
         </Card>
-        
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">In Progress</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{inProgressTrainings}</div>
-          </CardContent>
+          <CardContent><div className="text-2xl font-bold">{inProgressTrainings}</div></CardContent>
         </Card>
-        
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Completed</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{completedTrainings}</div>
-          </CardContent>
+          <CardContent><div className="text-2xl font-bold">{completedTrainings}</div></CardContent>
         </Card>
       </div>
       <Card>
@@ -234,9 +200,7 @@ export default function TrainingsPage() {
               ]}
               placeholder="Search audience..."
             />
-            <Button variant="outline" onClick={clearFilters}>
-              Clear Filters
-            </Button>
+            <Button variant="outline" onClick={clearFilters}>Clear Filters</Button>
             <AddTrainingSessionDialog onAddTraining={handleAddTraining}>
               <Button className="ml-auto">
                 <Plus className="h-4 w-4 mr-2" />
@@ -273,80 +237,14 @@ export default function TrainingsPage() {
                   </TableCell>
                 </TableRow>
               ) : paginatedData.length > 0 ? (
-                paginatedData.map((training) => {
-                  const router = useRouter();
-                  
-                  const handleRowClick = () => {
-                    router.push(`/trainings/${training.id}`);
-                  };
-
-                  // Format date for display
-                  const formatDate = (dateString: string) => {
-                    const date = new Date(dateString);
-                    return date.toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'short', 
-                      day: 'numeric' 
-                    });
-                  };
-
-                  // Format audience type for display
-                  const formatAudienceType = (audienceType: string) => {
-                    switch (audienceType) {
-                      case 'ALL': return 'All';
-                      case 'DEPARTMENT': return 'Department';
-                      case 'SPECIFIC': return 'Specific Employees';
-                      default: return audienceType;
-                    }
-                  };
-                  
-                  return (
-                    <TableRow 
-                      key={training.id} 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={handleRowClick}
-                    >
-                      <TableCell className="font-medium">{formatDate(training.date)}</TableCell>
-                      <TableCell>{training.trainingName}</TableCell>
-                      <TableCell>{training.facilitator}</TableCell>
-                      <TableCell>{training.trainingType}</TableCell>
-                      <TableCell>{formatAudienceType(training.audienceType)}</TableCell>
-                      <TableCell>{training.duration}h</TableCell>
-                      <TableCell>{training.startTime}</TableCell>
-                      <TableCell>{getStatusBadge(training.status)}</TableCell>
-                      <TableCell onClick={(e) => e.stopPropagation()}>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleAction("edit", training.id)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleAction("responses", training.id, training.trainingName)}>
-                            <MessageSquare className="mr-2 h-4 w-4" />
-                            Take Responses
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleAction("export", training.id)}>
-                            <FileDown className="mr-2 h-4 w-4" />
-                            Export as PDF
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleAction("delete", training.id)}
-                            className="text-red-600"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                  );
-                })
+                paginatedData.map((training) => (
+                  <TrainingRow
+                    key={training.id}
+                    training={training}
+                    getStatusBadge={getStatusBadge}
+                    onAction={handleAction}
+                  />
+                ))
               ) : (
                 <TableRow>
                   <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
@@ -357,61 +255,94 @@ export default function TrainingsPage() {
             </TableBody>
           </Table>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between space-x-2 py-4">
               <div className="text-sm text-muted-foreground">
                 Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredData.length)} of {filteredData.length} results
               </div>
               <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                >
-                  Previous
-                </Button>
+                <Button variant="outline" size="sm" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>Previous</Button>
                 <div className="flex items-center space-x-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setCurrentPage(page)}
-                      className="w-8 h-8 p-0"
-                    >
-                      {page}
-                    </Button>
+                    <Button key={page} variant={currentPage === page ? "default" : "outline"} size="sm" onClick={() => setCurrentPage(page)} className="w-8 h-8 p-0">{page}</Button>
                   ))}
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                >
-                  Next
-                </Button>
+                <Button variant="outline" size="sm" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>Next</Button>
               </div>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* QR Code Dialog */}
       {selectedTrainingId && (
         <QRCodeDialog
           isOpen={isQRDialogOpen}
-          onClose={() => {
-            setIsQRDialogOpen(false)
-            setSelectedTrainingId(null)
-            setSelectedTrainingName("")
-          }}
+          onClose={() => { setIsQRDialogOpen(false); setSelectedTrainingId(null); setSelectedTrainingName("") }}
           trainingId={selectedTrainingId}
           trainingName={selectedTrainingName}
         />
       )}
     </div>
+  )
+}
+
+// ── Extracted row component so hooks are not called inside map() ──────────────
+function TrainingRow({
+  training,
+  getStatusBadge,
+  onAction,
+}: {
+  training: TrainingSession
+  getStatusBadge: (status: string) => React.ReactNode
+  onAction: (action: string, id: number, name?: string) => void
+}) {
+  const router = useRouter()
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+  }
+
+  const formatAudienceType = (audienceType: string) => {
+    switch (audienceType) {
+      case 'ALL': return 'All'
+      case 'DEPARTMENT': return 'Department'
+      case 'SPECIFIC': return 'Specific Employees'
+      default: return audienceType
+    }
+  }
+
+  return (
+    <TableRow className="cursor-pointer hover:bg-muted/50" onClick={() => router.push(`/trainings/${training.id}`)}>
+      <TableCell className="font-medium">{formatDate(training.date)}</TableCell>
+      <TableCell>{training.trainingName}</TableCell>
+      <TableCell>{training.facilitator}</TableCell>
+      <TableCell>{training.trainingType}</TableCell>
+      <TableCell>{formatAudienceType(training.audienceType)}</TableCell>
+      <TableCell>{training.duration}h</TableCell>
+      <TableCell>{training.startTime}</TableCell>
+      <TableCell>{getStatusBadge(training.status)}</TableCell>
+      <TableCell onClick={(e) => e.stopPropagation()}>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => onAction("edit", training.id)}>
+              <Edit className="mr-2 h-4 w-4" />Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onAction("responses", training.id, training.trainingName)}>
+              <MessageSquare className="mr-2 h-4 w-4" />Take Responses
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onAction("export", training.id)}>
+              <FileDown className="mr-2 h-4 w-4" />Export as PDF
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onAction("delete", training.id)} className="text-red-600">
+              <Trash2 className="mr-2 h-4 w-4" />Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </TableCell>
+    </TableRow>
   )
 }

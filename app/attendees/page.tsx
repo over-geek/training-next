@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { Search, Plus, UserX, Loader2, CreditCard, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,10 +13,14 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar } from "@/components/ui/avatar"
 import { ScanAnimation } from "@/components/scan-animation"
 import { EmployeeService } from "@/services/employees/employee-service"
-import { DepartmentService } from "@/services/departments/department-service"
 import type { Employee } from "@/services/employees/types"
-import type { Department } from "@/services/departments/types"
 import { toast } from "sonner"
+import {
+  useEmployees,
+  useDepartments,
+  useCreateEmployee,
+  useToggleEmployeeStatus,
+} from "@/hooks/queries"
 
 
 export default function AttendeesPage() {
@@ -25,47 +29,16 @@ export default function AttendeesPage() {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false)
   const [selectedAttendee, setSelectedAttendee] = useState<Employee | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
-  const [employees, setEmployees] = useState<Employee[]>([])
-  const [departments, setDepartments] = useState<Department[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isCardScanning, setIsCardScanning] = useState(false)
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    departmentId: 0
-  })
+  const [formData, setFormData] = useState({ name: "", email: "", departmentId: 0 })
 
   const itemsPerPage = 8
 
-  useEffect(() => {
-    fetchEmployees()
-    fetchDepartments()
-  }, [])
-
-  const fetchEmployees = async () => {
-    try {
-      setIsLoading(true)
-      const data = await EmployeeService.getEmployees()
-      setEmployees(data)
-    } catch (error) {
-      console.error('Failed to fetch employees:', error)
-      toast.error('Failed to load employees. Please try again.')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const fetchDepartments = async () => {
-    try {
-      const data = await DepartmentService.getDepartments()
-      setDepartments(data)
-    } catch (error) {
-      console.error('Failed to fetch departments:', error)
-      toast.error('Failed to load departments. Please try again.')
-    }
-  }
+  const { data: employees = [], isLoading } = useEmployees()
+  const { data: departments = [] } = useDepartments()
+  const createEmployee = useCreateEmployee()
+  const toggleStatus = useToggleEmployeeStatus()
 
   const filteredAttendees = employees.filter(attendee =>
     (attendee.name || '').toLowerCase().includes(searchTerm.toLowerCase())
@@ -76,41 +49,26 @@ export default function AttendeesPage() {
   const paginatedAttendees = filteredAttendees.slice(startIndex, startIndex + itemsPerPage)
 
   const getStatusBadge = (status: string) => {
-    return status === "active" 
+    return status === "active"
       ? <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Active</Badge>
       : <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">Inactive</Badge>
   }
 
   const handleInputChange = (field: string, value: string | number) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }))
+    setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const handleAddAttendee = async () => {
+  const handleAddAttendee = () => {
     if (!isFormValid) return
-    
-    try {
-      setIsSubmitting(true)
-      await EmployeeService.createEmployee(formData)
-      
-      setFormData({
-        name: "",
-        email: "",
-        departmentId: 0
-      })
-      setIsAddModalOpen(false)
-      setCurrentPage(1)
-      
-      await fetchEmployees()
-      toast.success('Employee added successfully!')
-    } catch (error) {
-      console.error('Failed to add employee:', error)
-      toast.error('Failed to add employee. Please try again.')
-    } finally {
-      setIsSubmitting(false)
-    }
+    createEmployee.mutate(formData, {
+      onSuccess: () => {
+        setFormData({ name: "", email: "", departmentId: 0 })
+        setIsAddModalOpen(false)
+        setCurrentPage(1)
+        toast.success('Employee added successfully!')
+      },
+      onError: () => toast.error('Failed to add employee. Please try again.'),
+    })
   }
 
   const handleRowClick = (attendee: Employee) => {
@@ -120,64 +78,45 @@ export default function AttendeesPage() {
 
   const handleStatusToggle = async () => {
     if (!selectedAttendee) return
-    
-    try {
-      if (selectedAttendee.status === "inactive") {
-        setIsCardScanning(true)
-        try {
-          const message = await EmployeeService.updateEmployeeCard(selectedAttendee.id);
-          toast.success(message);
-        } catch (error: any) {
-          const errorMessage = error?.message || error?.toString() || 'Failed to update card';
-          console.error('Card update error:', error);
-          toast.error(errorMessage);
-          return;
-        }
-        
-        await EmployeeService.toggleEmployeeStatus(selectedAttendee.id)
-        setIsCardScanning(false)
-        setIsUpdatingStatus(true)
 
-        await fetchEmployees()
-        const employees = await EmployeeService.getEmployees()
-        const updatedEmployee = employees.find(emp => emp.id === selectedAttendee.id)
-        
-        if (!updatedEmployee) {
-          throw new Error("Failed to find updated employee data")
-        }
-        
-        toast.success('Employee re-registered successfully')
-        setIsDetailsModalOpen(false)
-      } else {
-        setIsUpdatingStatus(true)
-        await EmployeeService.toggleEmployeeStatus(selectedAttendee.id)
-        await fetchEmployees()
-        const employees = await EmployeeService.getEmployees()
-        const updatedEmployee = employees.find(emp => emp.id === selectedAttendee.id)
-        
-        if (!updatedEmployee) {
-          throw new Error("Failed to find updated employee data")
-        }
-        
-        toast.success(`Employee status has been changed to ${updatedEmployee.status}`)
-        setIsDetailsModalOpen(false)
+    if (selectedAttendee.status === "inactive") {
+      setIsCardScanning(true)
+      try {
+        const message = await EmployeeService.updateEmployeeCard(selectedAttendee.id)
+        toast.success(message as string)
+      } catch (error) {
+        toast.error((error as Error)?.message || 'Failed to update card')
+        setIsCardScanning(false)
+        return
       }
-    } catch (error) {
-      console.error('Error updating employee status:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update employee status'
-      toast.error(errorMessage)
-    } finally {
-      setIsUpdatingStatus(false)
+
       setIsCardScanning(false)
+      setIsUpdatingStatus(true)
+      toggleStatus.mutate(selectedAttendee.id, {
+        onSuccess: () => {
+          toast.success('Employee re-registered successfully')
+          setIsDetailsModalOpen(false)
+        },
+        onError: () => toast.error('Failed to re-register employee'),
+        onSettled: () => setIsUpdatingStatus(false),
+      })
+    } else {
+      setIsUpdatingStatus(true)
+      toggleStatus.mutate(selectedAttendee.id, {
+        onSuccess: () => {
+          toast.success('Employee status updated')
+          setIsDetailsModalOpen(false)
+        },
+        onError: () => toast.error('Failed to update employee status'),
+        onSettled: () => setIsUpdatingStatus(false),
+      })
     }
   }
 
-
-  const handleBackFromScanning = () => {
-    setIsCardScanning(false)
-  }
+  const handleBackFromScanning = () => { setIsCardScanning(false) }
 
   const isFormValid = formData.name && formData.email && formData.departmentId > 0
+  const isSubmitting = createEmployee.isPending
 
   return (
     <div className="p-6 space-y-6">
@@ -192,84 +131,41 @@ export default function AttendeesPage() {
               <Input
                 placeholder="Search attendees by name..."
                 value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value)
-                  setCurrentPage(1)
-                }}
+                onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1) }}
                 className="pl-10"
               />
             </div>
             <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
               <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Attendee
-                </Button>
+                <Button><Plus className="h-4 w-4 mr-2" />Add Attendee</Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                   <DialogTitle>Add New Attendee</DialogTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Add a new attendee to the system. They will be available for training assignments.
-                  </p>
+                  <p className="text-sm text-muted-foreground">Add a new attendee to the system. They will be available for training assignments.</p>
                 </DialogHeader>
-                
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <label htmlFor="name" className="text-sm font-medium">
-                      Full Name
-                    </label>
-                    <Input
-                      id="name"
-                      placeholder="John Doe"
-                      value={formData.name}
-                      onChange={(e) => handleInputChange("name", e.target.value)}
-                      disabled={isSubmitting}
-                    />
+                    <label htmlFor="name" className="text-sm font-medium">Full Name</label>
+                    <Input id="name" placeholder="John Doe" value={formData.name} onChange={(e) => handleInputChange("name", e.target.value)} disabled={isSubmitting} />
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium">
-                      Email
-                    </label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="john.doe@example.com"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
-                      disabled={isSubmitting}
-                    />
+                    <label htmlFor="email" className="text-sm font-medium">Email</label>
+                    <Input id="email" type="email" placeholder="john.doe@example.com" value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} disabled={isSubmitting} />
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="department" className="text-sm font-medium">
-                      Department
-                    </label>
+                    <label htmlFor="department" className="text-sm font-medium">Department</label>
                     <Select value={formData.departmentId > 0 ? formData.departmentId.toString() : ""} onValueChange={(value) => handleInputChange("departmentId", parseInt(value))} disabled={isSubmitting}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a department" />
-                      </SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder="Select a department" /></SelectTrigger>
                       <SelectContent>
                         {departments.map((dept) => (
-                          <SelectItem key={dept.id} value={dept.id.toString()}>
-                            {dept.name}
-                          </SelectItem>
+                          <SelectItem key={dept.id} value={dept.id.toString()}>{dept.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button 
-                    onClick={handleAddAttendee}
-                    disabled={!isFormValid || isSubmitting}
-                    className="w-full bg-gray-900 hover:bg-gray-800 text-white"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Adding...
-                      </>
-                    ) : (
-                      'Add Attendee'
-                    )}
+                  <Button onClick={handleAddAttendee} disabled={!isFormValid || isSubmitting} className="w-full bg-gray-900 hover:bg-gray-800 text-white">
+                    {isSubmitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Adding...</> : 'Add Attendee'}
                   </Button>
                 </div>
               </DialogContent>
@@ -301,11 +197,7 @@ export default function AttendeesPage() {
                 </TableRow>
               ) : paginatedAttendees.length > 0 ? (
                 paginatedAttendees.map((attendee) => (
-                  <TableRow 
-                    key={attendee.id}
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => handleRowClick(attendee)}
-                  >
+                  <TableRow key={attendee.id} className="cursor-pointer hover:bg-muted/50" onClick={() => handleRowClick(attendee)}>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-3">
                         <Avatar name={attendee.name} />
@@ -333,87 +225,46 @@ export default function AttendeesPage() {
                 Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredAttendees.length)} of {filteredAttendees.length} results
               </div>
               <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                >
-                  Previous
-                </Button>
+                <Button variant="outline" size="sm" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>Previous</Button>
                 <div className="flex items-center space-x-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setCurrentPage(page)}
-                      className="w-8 h-8 p-0"
-                    >
-                      {page}
-                    </Button>
+                    <Button key={page} variant={currentPage === page ? "default" : "outline"} size="sm" onClick={() => setCurrentPage(page)} className="w-8 h-8 p-0">{page}</Button>
                   ))}
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                >
-                  Next
-                </Button>
+                <Button variant="outline" size="sm" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>Next</Button>
               </div>
             </div>
           )}
           {filteredAttendees.length > 0 && totalPages <= 1 && (
-            <div className="mt-4 text-sm text-muted-foreground">
-              Showing {filteredAttendees.length} of {employees.length} employees
-            </div>
+            <div className="mt-4 text-sm text-muted-foreground">Showing {filteredAttendees.length} of {employees.length} employees</div>
           )}
         </CardContent>
       </Card>
 
       {/* Attendee Details Modal */}
-      <Dialog open={isDetailsModalOpen} onOpenChange={(open) => {
-        setIsDetailsModalOpen(open)
-        if (!open) {
-          setIsCardScanning(false) // Reset card scanning state when modal closes
-        }
-      }}>
+      <Dialog open={isDetailsModalOpen} onOpenChange={(open) => { setIsDetailsModalOpen(open); if (!open) setIsCardScanning(false) }}>
         <DialogContent className="sm:max-w-md">
           {selectedAttendee && (
             <>
               {isCardScanning ? (
-                // Card Scanning Phase
                 <>
                   <DialogHeader>
                     <div className="flex items-center gap-3 mb-4">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleBackFromScanning}
-                        className="p-2"
-                      >
-                        <ArrowLeft className="h-4 w-4" />
-                      </Button>
+                      <Button variant="ghost" size="sm" onClick={handleBackFromScanning} className="p-2"><ArrowLeft className="h-4 w-4" /></Button>
                       <div>
                         <DialogTitle className="text-xl">Register Card</DialogTitle>
                         <p className="text-sm text-muted-foreground">{selectedAttendee.name}</p>
                       </div>
                     </div>
                   </DialogHeader>
-                  
                   <div className="flex flex-col items-center justify-center py-8">
                     <ScanAnimation className="flex flex-col items-center" />
                     <div className="mt-6 text-center">
-                      <p className="text-sm text-muted-foreground">
-                        Hold your card near the reader to register it to your account.
-                      </p>
+                      <p className="text-sm text-muted-foreground">Hold your card near the reader to register it to your account.</p>
                     </div>
                   </div>
                 </>
               ) : (
-                // Normal Employee Details View
                 <>
                   <DialogHeader>
                     <div className="flex items-center gap-3 mb-4">
@@ -424,9 +275,7 @@ export default function AttendeesPage() {
                       </div>
                     </div>
                   </DialogHeader>
-                  
                   <div className="space-y-4">
-                    {/* Department and Status */}
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">Department</p>
@@ -437,12 +286,8 @@ export default function AttendeesPage() {
                         {getStatusBadge(selectedAttendee.status)}
                       </div>
                     </div>
-
-                    {/* Training History */}
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-2">
-                        Training History ({selectedAttendee.trainingHistory?.length || 0} trainings)
-                      </p>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">Training History ({selectedAttendee.trainingHistory?.length || 0} trainings)</p>
                       <ScrollArea className="h-48 w-full rounded-md border p-4">
                         <div className="space-y-3">
                           {selectedAttendee.trainingHistory && selectedAttendee.trainingHistory.length > 0 ? (
@@ -450,68 +295,26 @@ export default function AttendeesPage() {
                               <div key={training.id} className="flex justify-between items-start">
                                 <div className="flex-1">
                                   <p className="font-medium text-sm">{training.name}</p>
-                                  <p className="text-xs text-muted-foreground">{new Date(training.date).toLocaleDateString('en-US', { 
-                                    year: 'numeric', 
-                                    month: 'long', 
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                  })}</p>
+                                  <p className="text-xs text-muted-foreground">{new Date(training.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                                 </div>
                               </div>
                             ))
                           ) : (
-                            <p className="text-sm text-muted-foreground text-center py-4">
-                              No training history available
-                            </p>
+                            <p className="text-sm text-muted-foreground text-center py-4">No training history available</p>
                           )}
                         </div>
                       </ScrollArea>
                     </div>
-
-                    {/* Dynamic Action Button */}
                     <div className="pt-4">
                       {selectedAttendee.status === 'active' ? (
-                        <Button 
-                          variant="destructive" 
-                          onClick={handleStatusToggle}
-                          disabled={isUpdatingStatus}
-                          className="w-full"
-                        >
-                          {isUpdatingStatus ? (
-                            <>
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              Revoking Access...
-                            </>
-                          ) : (
-                            <>
-                              <UserX className="h-4 w-4 mr-2" />
-                              Revoke Access
-                            </>
-                          )}
+                        <Button variant="destructive" onClick={handleStatusToggle} disabled={isUpdatingStatus} className="w-full">
+                          {isUpdatingStatus ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Revoking Access...</> : <><UserX className="h-4 w-4 mr-2" />Revoke Access</>}
                         </Button>
                       ) : (
-                        <Button 
-                          onClick={handleStatusToggle}
-                          disabled={isUpdatingStatus || isCardScanning}
-                          className="w-full bg-blue-600 hover:bg-blue-700"
-                        >
-                          {isCardScanning ? (
-                            <>
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              Registering Card...
-                            </>
-                          ) : isUpdatingStatus ? (
-                            <>
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              Activating...
-                            </>
-                          ) : (
-                            <>
-                              <CreditCard className="h-4 w-4 mr-2" />
-                              Register Card & Activate
-                            </>
-                          )}
+                        <Button onClick={handleStatusToggle} disabled={isUpdatingStatus || isCardScanning} className="w-full bg-blue-600 hover:bg-blue-700">
+                          {isCardScanning ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Registering Card...</>
+                            : isUpdatingStatus ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Activating...</>
+                            : <><CreditCard className="h-4 w-4 mr-2" />Register Card &amp; Activate</>}
                         </Button>
                       )}
                     </div>

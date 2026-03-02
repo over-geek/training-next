@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ConditionalLayout } from "@/components/conditional-layout";
 import { AppInitializer } from "@/components/app-initializer";
 import { ThemeProvider } from "@/lib/theme-provider";
+import { ReactQueryProvider } from "@/components/react-query-provider";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -31,16 +32,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-        >
-          <AppInitializer />
-          <ConditionalLayout>
-            {children}
-          </ConditionalLayout>
-          <Toaster />
-        </ThemeProvider>
+        <ReactQueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+          >
+            <AppInitializer />
+            <ConditionalLayout>
+              {children}
+            </ConditionalLayout>
+            <Toaster />
+          </ThemeProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );

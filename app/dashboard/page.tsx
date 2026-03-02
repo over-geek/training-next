@@ -1,37 +1,16 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React from "react"
 import SummaryCards from "@/components/dashboard/summary-cards"
 import AreaChart from "@/components/dashboard/area-chart"
 import ActivityFeed from "@/components/dashboard/activity-feed"
 import AttendedTrainings from "@/components/dashboard/attended-trainings"
 import RatingBreakdown from "@/components/dashboard/rating-breakdown"
-import { TrainingService } from "@/services/trainings/training-service"
-import type { DashboardMetrics } from "@/services/trainings/types"
-import { toast } from "sonner"
+import { useDashboardMetrics } from "@/hooks/queries"
 import { Loader2 } from "lucide-react"
 
 export default function DashboardPage() {
-  const [dashboardData, setDashboardData] = useState<DashboardMetrics | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    fetchDashboardData()
-  }, [])
-
-  const fetchDashboardData = async () => {
-    try {
-      setIsLoading(true)
-      const data = await TrainingService.getDashboardMetrics()
-      setDashboardData(data)
-      console.log(data)
-    } catch (error) {
-      console.error('Failed to fetch dashboard data:', error)
-      toast.error('Failed to load dashboard data. Please try again.')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const { data: dashboardData, isLoading, isError } = useDashboardMetrics()
 
   if (isLoading) {
     return (
@@ -46,7 +25,7 @@ export default function DashboardPage() {
     )
   }
 
-  if (!dashboardData) {
+  if (isError || !dashboardData) {
     return (
       <div className="p-6 h-screen">
         <div className="h-full flex items-center justify-center">
