@@ -41,7 +41,7 @@ jobs:
 
       - name: Zip files preserving symlinks
         run: |
-         zip -r deploy.zip .next node_modules package.json public next.config.js
+         zip -r deploy.zip .next node_modules package.json public next.config.ts
         
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
