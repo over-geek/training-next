@@ -1,5 +1,5 @@
 import { api } from '@/lib/auth-service';
-import type { Training, TrainingSession, CreateTrainingSessionRequest, UpdateTrainingSessionRequest, AttendanceResponse, TrainingMetrics, UncompletedTraining, ActivityLog, DashboardMetrics, QRCodeData, EvaluationTokenVerification, EvaluationResponse } from './types';
+import type { Training, TrainingSession, CreateTrainingSessionRequest, UpdateTrainingSessionRequest, AttendanceResponse, TrainingMetrics, UncompletedTraining, ActivityLog, DashboardMetrics, QRCodeData, EvaluationTokenVerification, EvaluationResponse, CreateTrainingRequest, UpdateTrainingRequest } from './types';
 
 export class TrainingService {
   static async getTrainings(): Promise<Training[]> {
@@ -8,6 +8,35 @@ export class TrainingService {
       return response.data;
     } catch (error) {
       console.error('Failed to fetch trainings:', error);
+      throw error;
+    }
+  }
+
+  static async createTraining(data: CreateTrainingRequest): Promise<Training> {
+    try {
+      const response = await api.post<Training>('/trainings', data);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to create training:', error);
+      throw error;
+    }
+  }
+
+  static async updateTraining(data: UpdateTrainingRequest): Promise<Training> {
+    try {
+      const response = await api.put<Training>(`/trainings/${data.id}`, data);
+      return response.data;
+    } catch (error) {
+      console.error(`Failed to update training ${data.id}:`, error);
+      throw error;
+    }
+  }
+
+  static async deleteTraining(id: number): Promise<void> {
+    try {
+      await api.delete(`/trainings/${id}`);
+    } catch (error) {
+      console.error(`Failed to delete training ${id}:`, error);
       throw error;
     }
   }
@@ -46,8 +75,8 @@ export class TrainingService {
     try {
       const response = await api.patch<TrainingSession>(`/training-sessions/${trainingData.id}/status`, trainingData);
       return response.data;
-    } catch (error: any) {
-      if (error?.status === 405) {
+    } catch (error: unknown) {
+      if ((error as { status?: number })?.status === 405) {
         try {
           console.log('PATCH not supported, trying POST method...');
           const response = await api.post<TrainingSession>(`/training-sessions/${trainingData.id}/update`, trainingData);
@@ -81,9 +110,9 @@ export class TrainingService {
     }
   }
 
-  static async getTrainingResponses(trainingId: number): Promise<any[]> {
+  static async getTrainingResponses(trainingId: number): Promise<unknown[]> {
     try {
-      const response = await api.get<any[]>(`/training-sessions/${trainingId}/responses`);
+      const response = await api.get<unknown[]>(`/training-sessions/${trainingId}/responses`);
       return response.data;
     } catch (error) {
       console.error(`Failed to fetch training responses for training ${trainingId}:`, error);
