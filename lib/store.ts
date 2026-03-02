@@ -60,7 +60,7 @@ export const useAppStore = create<AppStore>()(
         }
         const machineId = get().machineId ?? (typeof window !== "undefined" ? localStorage.getItem("local_machine_id") : null);
         const machineParam = machineId ? `&machineId=${encodeURIComponent(machineId)}` : "";
-        const ws = new WebSocket(`ws://${WEBSOCKET_BASE_URL}/ws?token=${token}${machineParam}`);
+        const ws = new WebSocket(`wss://${WEBSOCKET_BASE_URL}/ws?token=${token}${machineParam}`);
         let heartbeat: ReturnType<typeof setInterval> | null = null;
         ws.onopen = () => {
           set({ wsInstance: ws, wsConnected: true }, false, "ws/open");
