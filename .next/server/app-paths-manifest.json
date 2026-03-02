@@ -10,6 +10,7 @@
   "/page": "app/page.js",
   "/tev/[token]/page": "app/tev/[token]/page.js",
   "/training-effectiveness/page": "app/training-effectiveness/page.js",
+  "/training-management/page": "app/training-management/page.js",
   "/trainings/[id]/page": "app/trainings/[id]/page.js",
   "/trainings/page": "app/trainings/page.js"
 }

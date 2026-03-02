@@ -100,6 +100,12 @@
       "namedRegex": "^/training\\-effectiveness(?:/)?$"
     },
     {
+      "page": "/training-management",
+      "regex": "^/training\\-management(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/training\\-management(?:/)?$"
+    },
+    {
       "page": "/trainings",
       "regex": "^/trainings(?:/)?$",
       "routeKeys": {},

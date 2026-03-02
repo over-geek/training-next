@@ -1,0 +1,26 @@
+{
+  "pages": {
+    "/training-management/page": [
+      "static/chunks/ff1a16fafef87110.js",
+      "static/chunks/fc7283cc1ce25557.js",
+      "static/chunks/2473c16c0c2f6b5f.css",
+      "static/chunks/b2348692fef27c82.css",
+      "static/chunks/a8e05681d2606b12.js",
+      "static/chunks/b32c8a1cb154582a.js",
+      "static/chunks/bde88926a7d15c78.js",
+      "static/chunks/6459c40d277c4418.js",
+      "static/chunks/1b1a016f77e32c2c.js",
+      "static/chunks/0a9714ac2124e102.js",
+      "static/chunks/cc7f2d18a381323c.js",
+      "static/chunks/d701f48a221e0dd2.js",
+      "static/chunks/f39701997745a62a.js",
+      "static/chunks/021fc3e1b05d982a.js",
+      "static/chunks/63a435f5d3c7357f.js",
+      "static/chunks/4956456c12bbd714.js",
+      "static/chunks/8082ab48faca5ea1.js",
+      "static/chunks/c19da6693934fea1.js",
+      "static/chunks/2008ffcf9e5b170c.js",
+      "static/chunks/turbopack-f3eb3135dbbe1444.js"
+    ]
+  }
+}

@@ -10,6 +10,7 @@
   "/page": "/",
   "/tev/[token]/page": "/tev/[token]",
   "/training-effectiveness/page": "/training-effectiveness",
+  "/training-management/page": "/training-management",
   "/trainings/[id]/page": "/trainings/[id]",
   "/trainings/page": "/trainings"
 }
