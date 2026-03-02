@@ -1,12 +1,13 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { toast } from "sonner"
 import { ControlHeader } from "./control-header"
 import { SummaryRibbon } from "./summary-ribbon"
 import { TrackingTable } from "./tracking-table"
 import type { TrainingSession, EvaluationStatus, TrainingEffectivenessEvaluation } from "./types"
 import { Loader2 } from "lucide-react"
-import { useTrainingEffectivenessEvals } from "@/hooks/queries"
+import { useTrainingEffectivenessEvals, useResendNudge } from "@/hooks/queries"
 
 const mapApiResponseToTrainingSession = (apiData: TrainingEffectivenessEvaluation): TrainingSession => {
   const trainingDate = new Date(apiData.trainingSessionDate);
@@ -38,6 +39,7 @@ export function TrainingEffectivenessTab() {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
   const { data: rawData = [], isLoading } = useTrainingEffectivenessEvals()
+  const resendNudgeMutation = useResendNudge()
   const sessions = useMemo(() => rawData.map(mapApiResponseToTrainingSession), [rawData])
 
   const filteredSessions = useMemo(() => {
@@ -66,8 +68,13 @@ export function TrainingEffectivenessTab() {
     return { sessionsDue, completionRate, pendingHRAction }
   }, [sessions])
 
-  const handleResendNudge = (sessionId: string) => {
-    console.log("Sending nudge for session:", sessionId)
+  const handleResendNudge = async (sessionId: string) => {
+    try {
+      await resendNudgeMutation.mutateAsync(sessionId)
+      toast.success("Nudge sent successfully!")
+    } catch {
+      toast.error("Failed to send nudge. Please try again.")
+    }
   }
 
   const handleSelectionChange = (ids: string[]) => {

@@ -156,7 +156,7 @@ export function TrackingTable({
                     className="gap-2 text-muted-foreground hover:text-foreground cursor-pointer"
                   >
                     <Send className="h-4 w-4" />
-                    Resend Nudge
+                    Nudge
                   </Button>
                 </TableCell>
               </TableRow>
