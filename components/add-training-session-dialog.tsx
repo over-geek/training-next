@@ -152,6 +152,21 @@ interface AddTrainingSessionDialogProps {
   children: React.ReactNode
 }
 
+type AudienceType = "ALL" | "DEPARTMENT" | "SPECIFIC_EMPLOYEES"
+
+interface TrainingSessionFormData {
+  trainingId: number
+  facilitator: string
+  duration: string
+  startTime: string
+  type: string
+  date: string
+  audienceType: AudienceType
+  selectedEmployeeIds: number[]
+  targetDepartmentIds: number[]
+  selectedDepartments: string[]
+}
+
 export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainingSessionDialogProps) {
   const [open, setOpen] = useState(false)
   const [trainingOpen, setTrainingOpen] = useState(false)
@@ -165,18 +180,17 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedTraining, setSelectedTraining] = useState<Training | null>(null)
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<TrainingSessionFormData>({
     trainingId: 0,
     facilitator: "",
     duration: "",
     startTime: "",
     type: "Staff Training",
     date: "",
-    audienceType: "ALL" as "ALL" | "DEPARTMENT" | "SPECIFIC",
-    selectedEmployeeIds: [] as number[],
-    targetDepartmentIds: [] as number[],
-    // UI only fields
-    selectedDepartments: [] as string[],
+    audienceType: "ALL",
+    selectedEmployeeIds: [],
+    targetDepartmentIds: [],
+    selectedDepartments: [],
   })
 
   const [searchValue, setSearchValue] = useState("")
@@ -185,7 +199,6 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
     training.name.toLowerCase().includes(searchValue.toLowerCase())
   )
 
-  // Filter departments and employees based on selected training requirements
   const getFilteredDepartments = () => {
     if (!selectedTraining || selectedTraining.category !== 'DEPARTMENT') {
       return departments;
@@ -195,7 +208,7 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
   }
 
   const getFilteredEmployees = () => {
-    if (!selectedTraining || selectedTraining.category !== 'SPECIFIC') {
+    if (!selectedTraining || selectedTraining.category !== 'SPECIFIC_EMPLOYEES') {
       return employees;
     }
     const requiredDeptIds = selectedTraining.requiredFor.map(dept => dept.id);
@@ -206,7 +219,6 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
     });
   }
 
-  // Fetch trainings, departments and employees when dialog opens
   useEffect(() => {
     if (open) {
       fetchTrainings()
@@ -295,7 +307,7 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
       return
     }
 
-    if (formData.audienceType === "SPECIFIC" && formData.selectedEmployeeIds.length === 0) {
+    if (formData.audienceType === "SPECIFIC_EMPLOYEES" && formData.selectedEmployeeIds.length === 0) {
       toast.error("Please select at least one employee")
       return
     }
@@ -335,7 +347,7 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
       ((formData.targetDepartmentIds.length > 0 && formData.selectedEmployeeIds.length === 0) || 
        (formData.selectedEmployeeIds.length > 0 && formData.targetDepartmentIds.length === 0))) || 
      (formData.audienceType === "DEPARTMENT" && formData.targetDepartmentIds.length > 0) ||
-     (formData.audienceType === "SPECIFIC" && formData.selectedEmployeeIds.length > 0))
+     (formData.audienceType === "SPECIFIC_EMPLOYEES" && formData.selectedEmployeeIds.length > 0))
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -450,7 +462,7 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
                 <p className="text-sm font-medium">
                   {selectedTraining.category === 'ALL' && 'All Employees - Manual Selection'}
                   {selectedTraining.category === 'DEPARTMENT' && 'Specific Departments'}
-                  {selectedTraining.category === 'SPECIFIC' && 'Specific Employees'}
+                  {selectedTraining.category === 'SPECIFIC_EMPLOYEES' && 'Specific Employees'}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   {selectedTraining.category === 'ALL' 
@@ -504,7 +516,7 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
           )}
 
           {/* Employee Selection - Conditional */}
-          {(formData.audienceType === "SPECIFIC" || formData.audienceType === "ALL") && (
+          {(formData.audienceType === "SPECIFIC_EMPLOYEES" || formData.audienceType === "ALL") && (
             <div className="space-y-2">
               <Label>Select Employees {formData.audienceType === "ALL" ? "(Optional)" : "*"}</Label>
               {formData.audienceType === "ALL" && (
@@ -523,7 +535,7 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
                   onSelectionChange={(values) => setFormData(prev => ({
                     ...prev,
                     selectedEmployeeIds: values.map(v => parseInt(v)),
-                    audienceType: values.length > 0 ? "SPECIFIC" : prev.audienceType
+                    audienceType: values.length > 0 ? "SPECIFIC_EMPLOYEES" : prev.audienceType
                   }))}
                   employees={getFilteredEmployees()}
                   isLoading={isEmployeesLoading}

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import Chart from 'react-apexcharts'
 import type { TrainingMetrics } from '@/services/trainings/types'
 
@@ -7,109 +7,49 @@ interface LineChartProps {
   title: string;
 }
 
-interface LineChartState {
-  options: any;
-  series: any[];
-}
+const LineChart: React.FC<LineChartProps> = ({ data, title }) => {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
 
-class LineChart extends Component<LineChartProps, LineChartState> {
-  constructor(props: LineChartProps) {
-    super(props);
-
-    this.state = {
-      options: {
-        chart: {
-          id: 'basic-bar',
-          toolbar: {
-            show: false
-          }
-        },
-        grid: {
-          show: false
-        },
-        dataLabels: {
-          enabled: false
-        },
-        fill: {
-          type: 'gradient',
-          gradient: {
-            shapeIntensity: 1,
-            opacityFrom: 0.5,
-            opacityTo: 0.2,
-            stops: [0, 90, 100]
-          },
-        },
-        stroke: {
-          curve: 'smooth',
-          width: 1
-        },
-        tooltip: {
-          x: {
-            show: true
-          }
-        },
-        title: {
-          text: this.props.title,
-        },
-        xaxis: {
-          categories: this.props.data.attendeeDates,
-          labels: {
-            show: false
-          },
-          axisBorder: {
-            show: false
-          },
-          axisTicks: {
-            show: false
-          }
-        },
-        yaxis: {
-          labels: {
-            show: false
-          }
-        }
+  const options = {
+    chart: {
+      id: 'basic-bar',
+      toolbar: { show: false },
+    },
+    grid: { show: false },
+    dataLabels: { enabled: false },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shapeIntensity: 1,
+        opacityFrom: 0.5,
+        opacityTo: 0.2,
+        stops: [0, 90, 100],
       },
-      series: [
-        {
-          name: 'training',
-          data: this.props.data.attendeeCount,
-          color: "#1A56DB"
-        }
-      ]
-    }
+    },
+    stroke: { curve: 'smooth' as const, width: 1 },
+    tooltip: { x: { show: true } },
+    title: { text: title },
+    xaxis: {
+      categories: data.attendeeDates,
+      labels: { show: false },
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+    },
+    yaxis: { labels: { show: false } },
   }
 
-  componentDidUpdate(prevProps: LineChartProps) {
-    if (prevProps.data !== this.props.data) {
-      this.setState({
-        options: {
-          ...this.state.options,
-          xaxis: {
-            ...this.state.options.xaxis,
-            categories: this.props.data.attendeeDates
-          },
-          title: {
-            text: this.props.title
-          }
-        },
-        series: [
-          {
-            name: 'training',
-            data: this.props.data.attendeeCount,
-            color: "#1A56DB"
-          }
-        ]
-      });
-    }
-  }
+  const series = [
+    { name: 'training', data: data.attendeeCount, color: '#1A56DB' },
+  ]
 
-  render() {
-    return (
-      <div className='w-full h-full'>
-        <Chart options={this.state.options} series={this.state.series} type="area" width="100%" height="100%" />
-      </div>
-    )
-  }
+  if (!mounted) return null
+
+  return (
+    <div className='w-full h-full'>
+      <Chart options={options} series={series} type="area" width="100%" height="100%" />
+    </div>
+  )
 }
 
 export default LineChart

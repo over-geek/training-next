@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, GraduationCap, AlertCircle, Users, LogOut } from "lucide-react"
+import { LayoutDashboard, GraduationCap, AlertCircle, Users, LogOut, BookOpen } from "lucide-react"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { AuthService } from "@/lib/auth-service"
@@ -16,7 +16,12 @@ const navItems = [
     icon: LayoutDashboard,
   },
   {
-    name: "Trainings",
+    name: "Training Management",
+    href: "/training-management",
+    icon: BookOpen,
+  },
+  {
+    name: "Training Sessions",
     href: "/trainings",
     icon: GraduationCap,
   },

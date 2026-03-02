@@ -1,13 +1,12 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { ControlHeader } from "./control-header"
 import { SummaryRibbon } from "./summary-ribbon"
 import { TrackingTable } from "./tracking-table"
-import { TrainingEffectivenessEvaluationService } from "@/services/tee/training-effectiveness-evaluation-service"
 import type { TrainingSession, EvaluationStatus, TrainingEffectivenessEvaluation } from "./types"
-import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
+import { useTrainingEffectivenessEvals } from "@/hooks/queries"
 
 const mapApiResponseToTrainingSession = (apiData: TrainingEffectivenessEvaluation): TrainingSession => {
   const trainingDate = new Date(apiData.trainingSessionDate);
@@ -34,29 +33,12 @@ const mapApiResponseToTrainingSession = (apiData: TrainingEffectivenessEvaluatio
 }
 
 export function TrainingEffectivenessTab() {
-  const [sessions, setSessions] = useState<TrainingSession[]>([])
-  const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<EvaluationStatus | "all">("all")
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
-  useEffect(() => {
-    fetchTrainingEffectivenessData()
-  }, [])
-
-  const fetchTrainingEffectivenessData = async () => {
-    try {
-      setIsLoading(true)
-      const data = await TrainingEffectivenessEvaluationService.getTrainingEffectivenessEval()
-      const mappedData = data.map(mapApiResponseToTrainingSession)
-      setSessions(mappedData)
-    } catch (error) {
-      console.error('Failed to fetch training effectiveness data:', error)
-      toast.error('Failed to load training effectiveness data. Please try again.')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const { data: rawData = [], isLoading } = useTrainingEffectivenessEvals()
+  const sessions = useMemo(() => rawData.map(mapApiResponseToTrainingSession), [rawData])
 
   const filteredSessions = useMemo(() => {
     return sessions.filter((session) => {

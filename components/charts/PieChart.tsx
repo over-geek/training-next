@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Chart from 'react-apexcharts'
 import type { TrainingMetrics } from '@/services/trainings/types'
 
@@ -7,6 +7,9 @@ interface PieChartProps {
 }
 
 const PieChart: React.FC<PieChartProps> = ({ data }) => {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+
   const options = {
     series: data.departmentBreakdown,
     labels: data.departmentNames,
@@ -38,6 +41,8 @@ const PieChart: React.FC<PieChartProps> = ({ data }) => {
       }
     }]
   }
+
+  if (!mounted) return null
 
   return (
     <div className='h-full'>

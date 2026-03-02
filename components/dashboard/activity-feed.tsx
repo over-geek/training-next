@@ -9,17 +9,15 @@ import {
   Plus, 
   UserPlus, 
   UserX, 
-  CreditCard,
   Clock,
   Loader2,
   MessageSquare,
   IdCard
 } from "lucide-react"
 import { motion } from "framer-motion"
-import { useState, useEffect } from "react"
-import { TrainingService } from "@/services/trainings/training-service"
+import { useState } from "react"
 import type { ActivityLog } from "@/services/trainings/types"
-import { toast } from "sonner"
+import { useActivityLogs } from "@/hooks/queries"
 
 interface ActivityFeedProps {
   className?: string;
@@ -91,27 +89,9 @@ const getIconBackgroundColor = (type: ActivityLog['type']) => {
 };
 
 export default function ActivityFeed({ className }: ActivityFeedProps) {
-  const [activities, setActivities] = useState<ActivityLog[]>([]);
   const [visibleCount, setVisibleCount] = useState(6);
-  const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-  useEffect(() => {
-    fetchActivityLogs();
-  }, []);
-
-  const fetchActivityLogs = async () => {
-    try {
-      setIsLoading(true);
-      const data = await TrainingService.getActivityLogs();
-      setActivities(data);
-    } catch (error) {
-      console.error('Failed to fetch activity logs:', error);
-      toast.error('Failed to load activity feed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { data: activities = [], isLoading } = useActivityLogs();
 
   const handleLoadMore = () => {
     setIsLoadingMore(true);
@@ -203,9 +183,9 @@ export default function ActivityFeed({ className }: ActivityFeedProps) {
                           </p>
                           {activity.comment && (
                             <div className="mt-2 p-2 bg-muted/50 rounded-md border-l-2 border-primary">
-                              <p className="text-xs text-muted-foreground italic">
-                                "{activity.comment}"
-                              </p>
+              <p className="text-xs text-muted-foreground italic">
+                &ldquo;{activity.comment}&rdquo;
+              </p>
                             </div>
                           )}
                         </div>
