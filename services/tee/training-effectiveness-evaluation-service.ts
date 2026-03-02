@@ -11,4 +11,13 @@ export class TrainingEffectivenessEvaluationService {
       throw error;
     }
   }
+
+  static async resendNudge(evaluationId: string): Promise<void> {
+    try {
+      await api.post(`/training-effectiveness/${evaluationId}/nudge`);
+    } catch (error) {
+      console.error(`Failed to resend nudge for evaluation ${evaluationId}:`, error);
+      throw error;
+    }
+  }
 }
