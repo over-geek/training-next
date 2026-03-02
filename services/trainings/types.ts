@@ -1,15 +1,26 @@
-// Types for training session related API responses
-
 export interface Training {
   id: number;
   name: string;
-  category: 'ALL' | 'DEPARTMENT' | 'SPECIFIC';
+  category: 'ALL' | 'DEPARTMENT' | 'SPECIFIC_EMPLOYEES';
   requiredFor: {
     id: number;
     name: string;
   }[];
   totalRequired: number;
   completed: number;
+}
+
+export interface CreateTrainingRequest {
+  name: string;
+  category: 'ALL' | 'DEPARTMENT' | 'SPECIFIC_EMPLOYEES';
+  requiredFor: number[];
+}
+
+export interface UpdateTrainingRequest {
+  id: number;
+  name: string;
+  category: 'ALL' | 'DEPARTMENT' | 'SPECIFIC_EMPLOYEES';
+  requiredFor: number[];
 }
 
 export interface TrainingSession {
@@ -21,7 +32,7 @@ export interface TrainingSession {
   trainingType: string;
   status: 'upcoming' | 'in-progress' | 'done';
   duration: string;
-  audienceType: 'ALL' | 'DEPARTMENT' | 'SPECIFIC';
+  audienceType: 'ALL' | 'DEPARTMENT' | 'SPECIFIC_EMPLOYEES';
   departmentNames: string[] | null;
 }
 
@@ -32,7 +43,7 @@ export interface CreateTrainingSessionRequest {
   startTime: string;
   type: string;
   date: string;
-  audienceType: 'ALL' | 'DEPARTMENT' | 'SPECIFIC';
+  audienceType: 'ALL' | 'DEPARTMENT' | 'SPECIFIC_EMPLOYEES';
   selectedEmployeeIds: number[];
   targetDepartmentIds: number[];
 }
@@ -46,7 +57,7 @@ export interface UpdateTrainingSessionRequest {
   trainingType?: string;
   status?: 'upcoming' | 'in-progress' | 'done';
   duration?: string;
-  audienceType?: 'ALL' | 'DEPARTMENT' | 'SPECIFIC';
+  audienceType?: 'ALL' | 'DEPARTMENT' | 'SPECIFIC_EMPLOYEES';
   departmentNames?: string[];
 }
 
