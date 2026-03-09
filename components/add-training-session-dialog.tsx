@@ -576,7 +576,7 @@ export function AddTrainingSessionDialog({ onAddTraining, children }: AddTrainin
                     }))
                     setDateOpen(false)
                   }}
-                  disabled={(date) => date < new Date()}
+                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                   initialFocus
                 />
               </PopoverContent>
