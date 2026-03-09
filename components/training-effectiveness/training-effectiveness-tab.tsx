@@ -6,8 +6,9 @@ import { ControlHeader } from "./control-header"
 import { SummaryRibbon } from "./summary-ribbon"
 import { TrackingTable } from "./tracking-table"
 import type { TrainingSession, EvaluationStatus, TrainingEffectivenessEvaluation } from "./types"
-import { Loader2 } from "lucide-react"
 import { useTrainingEffectivenessEvals, useResendNudge } from "@/hooks/queries"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const mapApiResponseToTrainingSession = (apiData: TrainingEffectivenessEvaluation): TrainingSession => {
   const trainingDate = new Date(apiData.trainingSessionDate);
@@ -87,13 +88,48 @@ export function TrainingEffectivenessTab() {
 
   if (isLoading) {
     return (
-      <div className="p-6 h-screen">
-        <div className="h-full flex items-center justify-center">
-          <div className="flex items-center space-x-2">
-            <Loader2 className="h-8 w-8 animate-spin" />
-            <span className="text-xl">Loading training effectiveness data...</span>
-          </div>
+      <div className="space-y-6">
+        {/* Control header skeleton */}
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+          <Skeleton className="h-10 w-full sm:max-w-sm rounded" />
+          <Skeleton className="h-10 w-40 rounded" />
         </div>
+        {/* Summary ribbon skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-9 w-9 rounded-md flex-shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-28 rounded" />
+                    <Skeleton className="h-7 w-16 rounded" />
+                    <Skeleton className="h-3 w-36 rounded" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        {/* Tracking table skeleton */}
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-5 w-40 rounded" />
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-4">
+                <Skeleton className="h-4 w-4 rounded" />
+                <Skeleton className="h-4 flex-1 rounded" />
+                <Skeleton className="h-4 w-28 rounded" />
+                <Skeleton className="h-4 w-24 rounded" />
+                <Skeleton className="h-4 w-20 rounded" />
+                <Skeleton className="h-6 w-24 rounded-full" />
+                <Skeleton className="h-8 w-8 rounded" />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       </div>
     )
   }

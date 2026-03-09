@@ -1,12 +1,12 @@
 "use client"
 
 import React, { useState, useMemo, useEffect } from "react"
-import { Search, Users, AlertTriangle, Filter, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Search, Users, AlertTriangle, Filter } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Avatar } from "@/components/ui/avatar"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
 import { TrainingService } from "@/services/trainings/training-service"
@@ -92,7 +92,7 @@ export default function MissingTrainingsPage() {
           <CardContent>
             <div className="text-2xl font-bold">
               {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
+                <Skeleton className="h-8 w-12 rounded" />
               ) : (
                 totalIncompleteTrainings
               )}
@@ -111,7 +111,7 @@ export default function MissingTrainingsPage() {
           <CardContent>
             <div className="text-2xl font-bold">
               {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
+                <Skeleton className="h-8 w-12 rounded" />
               ) : (
                 totalPendingEmployees
               )}
@@ -130,7 +130,7 @@ export default function MissingTrainingsPage() {
           <CardContent>
             <div className="text-2xl font-bold">
               {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
+                <Skeleton className="h-8 w-16 rounded" />
               ) : filteredTrainings.length > 0 ? (
                 Math.round(filteredTrainings.reduce((sum, t) => sum + t.completionRate, 0) / filteredTrainings.length)
               ) : (
@@ -176,11 +176,26 @@ export default function MissingTrainingsPage() {
       <Card>
         <CardContent>
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="flex items-center space-x-2">
-                <Loader2 className="h-6 w-6 animate-spin" />
-                <span className="text-lg">Loading missing trainings...</span>
-              </div>
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Card key={i}>
+                  <CardContent className="py-4">
+                    <div className="flex items-center justify-between w-full pr-4">
+                      <Skeleton className="h-6 w-48 rounded" />
+                      <div className="flex items-center gap-6">
+                        <div className="text-right space-y-2">
+                          <Skeleton className="h-6 w-12 rounded ml-auto" />
+                          <Skeleton className="h-2 w-24 rounded-full" />
+                        </div>
+                        <div className="space-y-1">
+                          <Skeleton className="h-4 w-24 rounded" />
+                          <Skeleton className="h-3 w-20 rounded" />
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           ) : (
             <Accordion type="multiple" className="w-full">

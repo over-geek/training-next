@@ -1,13 +1,14 @@
 "use client"
 
 import React, { useState } from "react"
-import { Search, Plus, Calendar, Users, BookOpen, Clock, MoreHorizontal, Trash2, Edit, FileDown, Loader2, MessageSquare } from "lucide-react"
+import { Search, Plus, Calendar, Users, BookOpen, Clock, MoreHorizontal, Trash2, Edit, FileDown, MessageSquare } from "lucide-react"
 import { PlusCircledIcon } from "@radix-ui/react-icons"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { FilterPopover } from "@/components/ui/filter-popover"
 import { AddTrainingSessionDialog } from "@/components/add-training-session-dialog"
@@ -109,28 +110,44 @@ export default function TrainingsPage() {
             <CardTitle className="text-sm font-medium">Upcoming Trainings</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent><div className="text-2xl font-bold">{upcomingTrainings}</div></CardContent>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {isLoading ? <Skeleton className="h-8 w-12 rounded" /> : upcomingTrainings}
+            </div>
+          </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Trainings This Year</CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent><div className="text-2xl font-bold">{trainingsThisYear}</div></CardContent>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {isLoading ? <Skeleton className="h-8 w-12 rounded" /> : trainingsThisYear}
+            </div>
+          </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">In Progress</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent><div className="text-2xl font-bold">{inProgressTrainings}</div></CardContent>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {isLoading ? <Skeleton className="h-8 w-12 rounded" /> : inProgressTrainings}
+            </div>
+          </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Completed</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent><div className="text-2xl font-bold">{completedTrainings}</div></CardContent>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {isLoading ? <Skeleton className="h-8 w-12 rounded" /> : completedTrainings}
+            </div>
+          </CardContent>
         </Card>
       </div>
       <Card>
@@ -228,14 +245,19 @@ export default function TrainingsPage() {
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8">
-                    <div className="flex items-center justify-center space-x-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span className="text-muted-foreground">Loading training sessions...</span>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell><Skeleton className="h-4 w-24 rounded" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-40 rounded" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-28 rounded" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-24 rounded" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-20 rounded" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-12 rounded" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-16 rounded" /></TableCell>
+                    <TableCell><Skeleton className="h-6 w-20 rounded-full" /></TableCell>
+                    <TableCell><Skeleton className="h-8 w-8 rounded" /></TableCell>
+                  </TableRow>
+                ))
               ) : paginatedData.length > 0 ? (
                 paginatedData.map((training) => (
                   <TrainingRow
